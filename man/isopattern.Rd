@@ -7,8 +7,7 @@
 \description{
 The function calculates the isotopic pattern (fine structure) of a given chemical formula or a
 set of chemical formulas (batch calculation), based on two fast and memory efficient algorithms. 
-The second algorithm can handle very large molecules and
-combinations of elements having many isotopes. 
+The second algorithm can handle very large molecules and combinations of elements having many isotopes. 
 Returns accurate masses, abundances and isotopic compositions of the individual isotopologues. 
 The isotopes of elements can be defined by the user.
 }
@@ -40,23 +39,27 @@ emass = 0.00054858, plotit = FALSE, algo=2)}
 
 \details{
 
-Isotope pattern calculation can be done by chosing one of two algorithms, set by argument \code{algo}. Both algorithms use
-hierarchical updates to derive the mass and abundance of a new isotopologue from an existing one, by steps of single isotope replacements starting 
-from the monoisotopic peak.
+Isotope pattern calculation can be done by chosing one of three algorithms, set by argument \code{algo}. All algorithms use
+hierarchical updates to derive the mass and abundance of a new isotopologue from an existing one, by steps of single isotope replacements.
+Memory usage is lower and in most cases faster for the first two algorithms as compared to the third, 
+allowing for calculation of very large molecules or inclusion of elements with many isotopes. Comparable in memory allocation, the second algorithm is 
+faster for very small molecules than the first - but much slower for larger ones. 
 
+The first algorithm \code{algo=1} uses tree-like combinatorial transitions to calculate daughter isotopologues from their parent node isotopologues, with
+the monoisotopic composition as root node.
+This approach first searches for branches of increasing abundance to find the isotopologue of maximum abundance, with transitions ordered as to minimize 
+the occurrence of decreasing branches. The remaining branches are subsequently omitted if they (a) fall below a threshold relative to this most abundant 
+isotopologue and (b) only contain branches of decreasing abundance. Furthermore, to avoid redundant calculations for transitions of the same isotope 
+(but not the same isotopologues!), this global search is conducted in elementwise subtrees that are then combined.
 
-The first algorithm \code{algo=1} is somewhat similar to the one poposed by Li et al. (2010). Herein, mass states and abundances are calculated 
-individually within seperate blocks for each of the elements present in a molecule. These building-blocks are then combined to individual isotopologues, with peaks 
-below the threshold abundance omitted. Herein, a fast calculation of elementwise building-blocks and their combination to isotopologues is implemented so as to 
-avoid redundant calculations from both different updates or different combinations leading to the same isotopologue.
+The second algorithm \code{algo=2} does not use elementwise subtree maximum abundance searches with no differences otherwise to the first algorithm.
 
-
-The second algorithm \code{algo=2} uses a tree-like combinatorial network instead of elementwise building-blocks. 
-Within this network, branches containing isotopologue subsets can be safely omitted from further updates during calculation if they fall below the threshold.
-Since calculations within this network concentrate on peak updates of increasing abundace, the global maximum abundance within the isotope pattern is fastly 
-detected and threshold truncation therefore optimized. The required minimum usage of memory is lower for this second algorithm, allowing for the calculation of very large molecules.
-It also outcompetes the first algorithm in speed for small molecule calculations. However, the first one may be superior for intermediate sized molecules, with
-the risk of runing out of memory (indicated by error messages).
+The third algorithm \code{algo=3} is similar to the one poposed by Li et al. (2010). Herein, mass states and abundances are calculated 
+individually within seperate blocks for each of the elements present in a molecule without (!) abundance thresholds. 
+These building-blocks are then combined to individual isotopologues, with peaks below the threshold abundance evenutally omitted. 
+Herein, a fast calculation of elementwise building-blocks and their combination to isotopologues is implemented so as to avoid redundant 
+calculations from both different updates or different combinations leading to 
+the same isotopologue.
 
 }
 
@@ -74,8 +77,7 @@ Each entry in that list contains information on individual isotopologues (rows) 
 
 \references{
 
-Loos, M. & Gerber, C., 201X. Hierarchical network calculation of very large isotope patterns. Some fancy journal.
-
+Loos, M. & Gerber, C., 201X. Hierarchical network calculation of very large isotope patterns. To be submitted.
 
 Li, L., Karabacak, N., Cobb, J., Wang, Q., Hong, P., agar, J., 2010. Memory-efficient calculation of the isotopic mass states of a molecule.
 Rapid Communications in Mass Spectrometry, 24: 2689-2696.

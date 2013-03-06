@@ -22,6 +22,54 @@
 #include "preferences.h"
 
 
+int calc_algo_1(Element *elements, double *mass, double *a, int *cc, int *p_a, double threshold, int i_a,int e_a){
+
+    unsigned int peak_limit = MAX_PEAKS;
+    unsigned int peak_amount = 0;
+    
+    unsigned short element_amount = e_a;
+    unsigned short mass_amount = 0;
+    unsigned short iso_amount = i_a;
+    
+    double a_max = 1.0;
+    peak_amount = 0;
+    
+    CombinationMulti_A* A = (CombinationMulti_A*)malloc(sizeof(CombinationMulti_A));
+    CombinationMulti_C* C = (CombinationMulti_C*)malloc(sizeof(CombinationMulti_C));
+    Combination2* combinations = (Combination2*)malloc(element_amount*sizeof(Combination2));
+
+    for (unsigned short i = 0; i < element_amount; i++) {
+        calc_combination_max_abundance((combinations + i), (elements + i), threshold,A,C);
+        a_max *= (combinations + i)->max_abundance;
+    }
+    
+    for (unsigned short j = 0; j < element_amount; j++) {
+        double clean_abundance = a_max/(combinations + j)->max_abundance;
+        if(create_combination_algo_1(combinations + j, elements + j, clean_abundance, (threshold * a_max)/100.0, peak_limit,A,C)){
+            //printf("ERROR: could not create combinations\n");
+            free(combinations);
+            free(A);
+            free(C);
+            return 1;
+        }
+    }
+
+    if(combine_combinations_algo_1(combinations, threshold, element_amount, mass, a, cc, &peak_amount, peak_limit, iso_amount, a_max)){
+        //printf("ERROR: could not combine combinations\n");
+        free(combinations);
+        free(A);
+        free(C);
+        return 1;
+    }
+    
+    *p_a = peak_amount;
+    
+    free(combinations);
+    free(A);
+    free(C);
+    return 0;
+}
+
 SEXP iso_ppm_Call(SEXP start, SEXP end, SEXP ppm_R) {
     
     double s;
@@ -111,7 +159,7 @@ SEXP iso_pattern_Call_2(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
     int *cc = (int*)malloc(p_l * MAX_ISO_SIZE * sizeof(int));
     unsigned int peak_amount = 0;
 
-    if(create_combination_2(mass, a ,cc, &max_a, elements, element_amount, t, &peak_amount, p_l)){
+    if(calc_pattern_algo_2(mass, a ,cc, &max_a, elements, element_amount, t, &peak_amount, p_l)){
         Rprintf("ERROR: could not create combinations\n");
         UNPROTECT(4);
         free(elements);
@@ -120,6 +168,8 @@ SEXP iso_pattern_Call_2(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
         free(cc);
         return R_NilValue;
     }
+    
+    
     SEXP iso_pattern = PROTECT(allocVector(VECSXP, 3 + iso_amount));
     SEXP mass_R;
     SEXP a_R;
@@ -196,7 +246,7 @@ SEXP iso_pattern_Call_2(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
 
 /*************************
  
- calculates isotopic pattern with algorithm 1
+ calculates isotopic pattern with algorithm 3
  
  sum:           character array of sum formula
  peak_limit:    maximum allowed peak amount
@@ -204,7 +254,7 @@ SEXP iso_pattern_Call_2(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
  iso_list:      character array of elements with their isotopes
  
  *************************/
-SEXP iso_pattern_Call(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list) {
+SEXP iso_pattern_Call_3(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list) {
 
     char *s;
     char *i_l;
@@ -278,7 +328,7 @@ SEXP iso_pattern_Call(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list) 
     double max_mass = 0.0;
     
     for (unsigned short j = 0; j < element_amount; j++) {
-        if (create_combination((combinations + j), elements + j, mass_amount, t * a_monoisotopic / 100)) {
+        if (create_combinations_algo_3((combinations + j), elements + j, mass_amount, t * a_monoisotopic / 100)) {
             Rprintf("ERROR: cannot create combinations of the single elements\n");
             UNPROTECT(4);
             free(cc);
@@ -297,7 +347,7 @@ SEXP iso_pattern_Call(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list) 
     const size_t len = element_amount;
     size_t sizes[element_amount];
 
-    clean_combinations(combinations, t * max_abundance / 100 , element_amount);
+    clean_combinations_algo_3(combinations, t * max_abundance / 100 , element_amount);
     
     double mass_;
     double abundance_;
@@ -424,6 +474,139 @@ SEXP iso_pattern_Call(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list) 
     return iso_pattern;
 }
 
+/*************************
+ 
+ calculates isotopic pattern with algorithm 1
+ 
+ sum:           character array of sum formula
+ peak_limit:    maximum allowed peak amount
+ threshold:     only peaks equal or above this threshold are returned
+ iso_list:      character array of elements with their isotopes
+ 
+ *************************/
+SEXP iso_pattern_Call(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list) {
+    
+    char *s;
+    char *i_l;
+    int p_l;
+    double t;
+    
+    PROTECT(sum = AS_CHARACTER(sum));
+    PROTECT(iso_list = AS_CHARACTER(iso_list));
+    PROTECT(peak_limit = AS_INTEGER(peak_limit));
+    PROTECT(threshold = AS_NUMERIC(threshold));
+    
+    s = R_alloc(strlen(CHARACTER_VALUE(sum)), sizeof(char));
+    i_l = R_alloc(strlen(CHARACTER_VALUE(iso_list)), sizeof(char));
+    p_l = INTEGER_VALUE(peak_limit);
+    t = NUMERIC_VALUE(threshold);
+    
+    int max_p = MAX_PEAKS;
+    if (p_l > max_p) {
+        Rprintf("\n ERROR: peak limit of %d exeeds MAX peak limit of %d\n", p_l, max_p);
+        UNPROTECT(4);
+        return R_NilValue;
+    }
+    
+    strcpy(s, CHARACTER_VALUE(sum));
+    strcpy(i_l, CHARACTER_VALUE(iso_list));
+    
+    Element* elements = NULL;
+    
+    unsigned short element_amount = 0;
+    unsigned short mass_amount = 0;
+    unsigned short iso_amount = 0;
+
+    elements = (Element*)malloc(MAX_ELEMENTS * sizeof(Element));
+    
+    
+    if ( parse_sum_formula(elements, s, &element_amount, &mass_amount, &iso_amount, i_l) ) {
+        Rprintf("\n ERROR: cannot parse sum formula with the given isolist\n");
+        UNPROTECT(4);
+        return R_NilValue;
+    }
+    
+    qsort(elements, element_amount, sizeof(Element), elements_sort_by_isoamount_inc);
+    
+    double* mass;
+    double* a;
+    int *cc = (int*)malloc(p_l * iso_amount * sizeof(int));
+    unsigned int peak_amount = 0;
+    mass = (double*)malloc(p_l * sizeof(double));
+    a = (double*)malloc(p_l * sizeof(double));
+    
+    SEXP list_names;
+    char* l_n = (char*)malloc((iso_amount + 2) * MAX_NAME_SIZE * sizeof(char));
+    memcpy(l_n, "mass", MAX_NAME_SIZE * sizeof(char));
+    memcpy(l_n + MAX_NAME_SIZE, "abundance", MAX_NAME_SIZE * sizeof(char));
+    
+    if(calc_algo_1(elements, mass, a, cc, &peak_amount, t, iso_amount,element_amount)){
+        Rprintf("\n ERROR: Unable to calculate isotope pattern\n");
+        UNPROTECT(4);
+        return R_NilValue;
+    }
+
+    int index = 0;
+    for (int b = 0; b < element_amount; b++) {
+        for (int bb = 0; bb < (elements+b)->iso_amount; bb++) {
+            strncpy(l_n + (index + 2) * MAX_NAME_SIZE, ((elements + b)->isotopes + bb)->isotope, MAX_NAME_SIZE*sizeof(char));
+            index++;
+        }
+    }
+
+    free(elements);
+    
+    SEXP iso_pattern = PROTECT(allocVector(VECSXP, 3 + iso_amount));
+    SEXP mass_R;
+    SEXP a_R;
+    double *p_m_R;
+    double *p_a_R;
+    PROTECT(mass_R = NEW_NUMERIC(peak_amount));
+    PROTECT(a_R = NEW_NUMERIC(peak_amount));
+    p_m_R = NUMERIC_POINTER(mass_R);
+    p_a_R = NUMERIC_POINTER(a_R);
+    
+    for (int k = 0; k < peak_amount; k ++) {
+        p_m_R[k] = *(mass + k);
+        p_a_R[k] = *(a + k);
+    }
+    
+    SET_VECTOR_ELT(iso_pattern, 0, mass_R);
+    SET_VECTOR_ELT(iso_pattern, 1, a_R);
+    
+    for (int q = 0; q < iso_amount; q++) {
+        SEXP compound_R;
+        int *compound;
+        PROTECT(compound_R = NEW_INTEGER(peak_amount));
+        compound = INTEGER_POINTER(compound_R);
+        
+        for (int r = 0; r < peak_amount; r++) {
+            compound[r] = *(cc + r * iso_amount + q);
+        }
+        
+        SET_VECTOR_ELT(iso_pattern, q + 2, compound_R);
+        UNPROTECT(1);
+    }
+    
+    PROTECT(list_names = allocVector(STRSXP, iso_amount + 3));
+    for(int o = 0; o < iso_amount + 2; o++){
+        char tmp[ MAX_NAME_SIZE ];
+        memcpy(tmp, l_n + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+        SET_STRING_ELT(list_names, o,  mkChar(tmp));
+    }
+    SET_STRING_ELT(list_names, iso_amount + 2,  mkChar("NAMES"));
+    setAttrib(iso_pattern, R_NamesSymbol, list_names);
+    SET_VECTOR_ELT(iso_pattern, iso_amount + 2, list_names);
+    
+    free(mass);
+    free(a);
+    free(l_n);
+    free(cc);
+    
+    UNPROTECT(8);
+    return iso_pattern;
+}
+
 
 /*************************
  
@@ -468,52 +651,10 @@ SEXP iso_centroid_Call(SEXP profile_mass, SEXP profile_abundance, SEXP type) {
         if (t == 1) {
             if ( *(p_a + i) >= *(p_a + i + step) && *(p_a + i) > *(p_a + i - step)  ) {
                 
-                if (fabs(*(p_m + i) - *(p_m + i + step)) >= 0.1) {
-                    double x[3];
-                    double y[3];
-                    x[0] = *(p_m + i - step);
-                    x[1] = *(p_m + i);
-                    x[2] = *(p_m + i + step);
-                    
-                    y[0] = *(p_a + i - step);
-                    y[1] = *(p_a + i);
-                    y[2] = *(p_a + i + step);
-                    
-                    double b_ = (-y[0]*pow(x[1],2)
-                                 + y[0]*pow(x[2],2)
-                                 - y[1]*pow(x[2],2)
-                                 + y[1]*pow(x[0],2)
-                                 - y[2]*pow(x[0],2)
-                                 + y[2]*pow(x[1],2))
-                    /(-pow(x[1],2)*x[0]
-                      + pow(x[2],2)*x[0]
-                      - pow(x[2],2)*x[1]
-                      + pow(x[0],2)*x[1]
-                      - pow(x[0],2)*x[2]
-                      + pow(x[1],2)*x[2]
-                      );
-                    
-                    double a_ = (y[1] - y[2] - b_* x[1] + b_* x[2])/(pow(x[1],2) - pow(x[2],2));
-                    double c_ = y[0] - a_ * pow(x[0], 2) - b_ * x[0];
-                    
-                    double xa = -b_/(2*a_);
-                    
-                    if (isnormal(a_) && isnormal(b_) && isnormal(c_)) {
-                        *(c_a + j) = a_* pow(xa, 2) + b_ * xa + c_;
-                        *(c_m + j) = xa;
-                        j++;
-                        
-                    }else{
-                        *(c_a + j) = *(p_a + i);
-                        *(c_m + j) = *(p_m + i);
-                        j++;
-                    }
-                    
-                }else{
-                    *(c_a + j) = *(p_a + i);
-                    *(c_m + j) = *(p_m + i);
-                    j++;
-                }
+                *(c_a + j) = *(p_a + i);
+                *(c_m + j) = *(p_m + i);
+                j++;
+                
                 if (*(c_a + j) > max_intensoid) {
                     max_intensoid = *(c_a + j);
                 }

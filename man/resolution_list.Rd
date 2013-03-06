@@ -14,7 +14,7 @@
 \format{
 
 The format is:
-List with 18 data sets: Instrument/Resolution@m/z
+List with 19 data sets: Instrument/Resolution@m/z
 
 Elite/R240000@400
 
@@ -51,6 +51,8 @@ Exactive/R25000@200
 Exactive/R12500@200
 
 TripleTOF5600/R28000@200 
+
+QTOF_XevoG2-S/R25000@200
   
 }
 \source{

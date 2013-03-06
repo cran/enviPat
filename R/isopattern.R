@@ -18,7 +18,7 @@ function(
     if(length(charge)!=length(chemforms) & length(charge)>1){stop("length of charge does not match number of chemforms!\n")}
     if(charge==0 & charge!=FALSE){stop("WARNING: charge=0?")}
     if(is.numeric(charge)==FALSE & charge!=FALSE){stop("WARNING: charge either numeric or FALSE!")}
-    if(algo!=1 & algo!=2){stop("invalid algo argument!")}
+    if(algo!=1 & algo!=2 & algo!=3){stop("invalid algo argument!")}
     options(digits=10);
     ############################################################################
     # (2) parse isolist, set charge ############################################
@@ -43,29 +43,38 @@ function(
       #              value is relative to the maximum abundance
       if(algo==1){
         out <- .Call( "iso_pattern_Call",
-      s1 = as.character(chemforms[i]),   # chemical formula
-      pl = as.integer(1E6),             # number of peaks to be reserved for
-      t1 = as.double(threshold),        # relative intensity cutoff
-      iso_list1 = as.character(isolist) # parsed isotope list
-    )
-      }else{
+        s1 = as.character(chemforms[i]),   # chemical formula
+        pl = as.integer(1E6),             # number of peaks to be reserved for
+        t1 = as.double(threshold),        # relative intensity cutoff
+        iso_list1 = as.character(isolist) # parsed isotope list
+        );
+      }
+      if(algo==2){
         out <- .Call( "iso_pattern_Call_2",
-      s1 = as.character(chemforms[i]),   # chemical formula
-      pl = as.integer(1E6),             # number of peaks to be reserved for
-      t1 = as.double(threshold),        # relative intensity cutoff
-      iso_list1 = as.character(isolist) # parsed isotope list
-    )
-  }
-  # parse output ###########################################################
-  if(length(out[[1]])==0){
-         pattern[[i]]<-"error"
+        s1 = as.character(chemforms[i]),   # chemical formula
+        pl = as.integer(1E6),             # number of peaks to be reserved for
+        t1 = as.double(threshold),        # relative intensity cutoff
+        iso_list1 = as.character(isolist) # parsed isotope list
+        );
+      }
+      if(algo==3){
+        out <- .Call( "iso_pattern_Call_3",
+        s1 = as.character(chemforms[i]),   # chemical formula
+        pl = as.integer(1E6),             # number of peaks to be reserved for
+        t1 = as.double(threshold),        # relative intensity cutoff
+        iso_list1 = as.character(isolist) # parsed isotope list
+        );
+      }
+      # parse output ###########################################################
+      if(length(out[[1]])==0){
+         pattern[[i]]<-"error";
          names(pattern)[i]<-chemforms[i]
       }else{
         out2<-as.data.frame(out[[1]])
         for(j in 2:(length(out)-1)){
-      out2<-cbind(out2,out[[j]])
-    }
-    out2<-out2[order(out2[,1],decreasing=FALSE),]
+            out2<-cbind(out2,out[[j]])
+        }
+        out2<-out2[order(out2[,1],decreasing=FALSE),]
         names(out2)<-out[[length(out)]][-length(out[[length(out)]])]
         names(out2)[1]<-"m/z"
         if(charge[i]!=FALSE){
@@ -73,17 +82,18 @@ function(
           out2[,1]<-c(out2[,1]/abs(charge[i]));  # /charge=z
         }
         pattern[[i]]<-out2
-    names(pattern)[i]<-as.character(chemforms[i]);
-    if(plotit==TRUE){
-        plot(out2[,1],out2[,2],type="h",
-              xlab="m/z",ylab="Relative abundance",main=names(pattern)[i])
-    }
-  }
+        names(pattern)[i]<-as.character(chemforms[i]);
+        if(plotit==TRUE){
+            plot(out2[,1],out2[,2],type="h",
+            xlab="m/z",ylab="Relative abundance",main=names(pattern)[i])
+        }
+      }  
+  }  
+  cat(" done.");
+  ############################################################################
+  # (3) output ###############################################################
+  return(pattern)
+  ############################################################################
 }
-cat(" done.");
-    ############################################################################
-    # (3) output ###############################################################
-    return(pattern) 
-    ############################################################################
 
-}
+

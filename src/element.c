@@ -13,6 +13,7 @@
 #include "element.h"
 #include "isotope.h"
 
+
 int set_element(Element* element, Isotope* isotopes, char* name, int amount, int iso_amount)
 {
     element->amount = amount;
@@ -21,4 +22,39 @@ int set_element(Element* element, Isotope* isotopes, char* name, int amount, int
     memcpy(element->isotopes, isotopes, iso_amount*sizeof(Isotope));
     qsort(element->isotopes, iso_amount, sizeof(Isotope), isotope_sort_by_abundance);
 	return 0;
+}
+
+//void print_element(Element* element){
+//    printf("# %d   element %s: \n", element->amount, element->name);
+//    printf("    Isotopes(%d)\n",element->iso_amount);
+//    
+//    for (int i = 0; i < element->iso_amount; i++) {
+//        printf("        %s  mass: %f    abundance: %f\n",(element->isotopes + i)->isotope, (element->isotopes + i)->mass, (element->isotopes + i)->abundance);
+//    }
+//}
+
+int elements_sort_by_isoamount_inc(const void *a, const void *b)
+{
+    double y1 = ((const struct Element*)a)->iso_amount;
+    double y2 = ((const struct Element*)b)->iso_amount;
+    
+    if (y1 > y2) {
+        return 1;
+    } else if (y1 < y2) {
+        return -1;
+    }
+    return 0;
+}
+
+int elements_sort_by_isoamount_dec(const void *a, const void *b)
+{
+    double y1 = ((const struct Element*)a)->iso_amount;
+    double y2 = ((const struct Element*)b)->iso_amount;
+    
+    if (y1 < y2) {
+        return 1;
+    } else if (y1 > y2) {
+        return -1;
+    }
+    return 0;
 }

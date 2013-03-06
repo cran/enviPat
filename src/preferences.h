@@ -21,8 +21,17 @@
 // allowed size of different elements within the sum formula
 #define MAX_ELEMENTS 20
 
-// allowed size of different elements within the sum formula
-#define MAX_COMPOUNDS 300000
+// allowed size of different compounds
+#define MAX_COMPOUNDS 400000
+
+// allowed size of different compounds
+#define MAX_COMPOUNDS_2 200000
+
+// allowed size of different compounds
+#define MAX_COMPOUNDS_A2 400000
+
+// allowed size of different compounds within A list
+#define MAX_COMPOUNDS_A 20000
 
 // allowed amount of maximum peaks
 #define MAX_PEAKS 1000000
