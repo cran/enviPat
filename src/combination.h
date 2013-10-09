@@ -11,11 +11,15 @@
 
 #include "isotope.h"
 #include "element.h"
+#include "preferences.h"
 
 typedef struct Compound Compound;
 typedef struct Combination Combination;
+typedef struct Combination2 Combination2;
 typedef struct CompoundMulti CompoundMulti;
 typedef struct CombinationMulti CombinationMulti;
+typedef struct CombinationMulti_C CombinationMulti_C;
+typedef struct CombinationMulti_A CombinationMulti_A;
 
 struct Compound{
     unsigned int sum[MAX_ISO_ELEM];
@@ -40,6 +44,17 @@ struct CompoundMulti{
     unsigned short indicator_iso;
 };
 
+struct Combination2 {
+    Compound compounds[MAX_COMPOUNDS_2];
+    CompoundMulti a2_list[MAX_COMPOUNDS_A2];
+    int a2_amount;
+    Element element;
+    double max_abundance;
+    double max_mass;
+    int amount;
+};
+
+
 struct CombinationMulti {
     CompoundMulti compounds[MAX_COMPOUNDS];
     double max_abundance;
@@ -47,15 +62,69 @@ struct CombinationMulti {
     int amount;
 };
 
-int create_combination(Combination* combination,
-                       Element *element,
-                       int n,
-                       double threshold);
-int compoundmulti_sort_by_abundance_dec(const void *a,
-                                        const void *b);
-int compoundmulti_sort_by_abundance_inc(const void *a,
-                                        const void *b);
-int create_combination_2(double* m,
+struct CombinationMulti_C {
+    CompoundMulti compounds[MAX_ISO_SIZE];
+    double max_abundance;
+    double max_mass;
+    int amount;
+};
+
+struct CombinationMulti_A {
+    CompoundMulti compounds[MAX_COMPOUNDS_A];
+    double max_abundance;
+    double max_mass;
+    int amount;
+};
+
+
+
+// algo 3 ////////////////////////////////////////////////////////////////////////////////
+int create_combinations_algo_3( Combination* combination,
+                                Element *element,
+                                int n,
+                                double threshold);
+
+int calc_pattern_algo_3(Combination* combinations,
+                         double threshold,
+                         unsigned short element_amount,
+                         double* mass,
+                         double* a,
+                         unsigned int* peak_amount,
+                         unsigned int peak_limit);
+
+int clean_combinations_algo_3(Combination* combinations,
+                       double threshold,
+                       unsigned short comb_amount);
+
+
+// algo 1 ////////////////////////////////////////////////////////////////////////////////
+int calc_combination_max_abundance(Combination2* combination,
+                                   Element *element,
+                                   double threshold,
+                                   CombinationMulti_A* A,
+                                   CombinationMulti_C* C);
+
+int create_combination_algo_1(   Combination2 *combination,
+                                 Element *element,
+                                 double clean_abundance,
+                                 double threshold,
+                                 int peak_limit,
+                                 CombinationMulti_A* A,
+                                 CombinationMulti_C* C);
+
+int combine_combinations_algo_1(Combination2* combinations,
+                                double threshold,
+                                unsigned short element_amount,
+                                double* m,
+                                double* a,
+                                int* cc,
+                                unsigned int* peak_amount,
+                                unsigned int peak_limit,
+                                unsigned int iso_amount,
+                                double max_abundance);
+
+// algo 2 ////////////////////////////////////////////////////////////////////////////////
+int calc_pattern_algo_2(double* m,
                          double* a,
                          int *cc,
                          double* max_a,
@@ -65,17 +134,24 @@ int create_combination_2(double* m,
                          unsigned int* peak_amount,
                          int peak_limit);
 
-int calc_combinations(Combination* combinations,
+int clean_combinations_2(Combination2* combinations,
                          double threshold,
-                         unsigned short element_amount,
-                         double* mass,
-                         double* a,
-                         unsigned int* peak_amount,
-                         unsigned int peak_limit
-                      );
-int clean_combinations(Combination* combinations,
-                       double threshold,
-                       unsigned short comb_amount);
+                         unsigned short comb_amount);
+
+
 void print_compoundmulti(CompoundMulti cm);
+
+int compound_sort_by_abundance_dec(const void *a, const void *b);
+int compound_sort_by_abundance_inc(const void *a, const void *b);
+int compoundmulti_sort_by_abundance_dec(const void *a, const void *b);
+int compoundmulti_sort_by_abundance_inc(const void *a, const void *b);
+int combinations_sort_by_amount_inc(const void *a, const void *b);
+int combinations_sort_by_amount_dec(const void *a, const void *b);
+
+void calc_monoisotopic_single(Element* element, CompoundMulti *monoisotopic);
+void create_isotope_list_single(Element *element, Isotope2 *isotopes, int *iso_c);
+
+void create_isotope_list(Element *elements, int element_amount, Isotope2 *isotopes, int *iso_c);
+void calc_monoisotopic(Element* elements, int element_amount, CompoundMulti *monoisotopic);
 
 #endif

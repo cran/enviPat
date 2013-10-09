@@ -2,7 +2,7 @@
 \alias{enviPat-package}
 \alias{enviPat}
 \docType{package}
-\title{ Calculation of isotope patterns, stick profiles (envelopes) and centroids/intensoids.}
+\title{ Calculation of isotope patterns, stick profiles (envelopes) and centroids/intensoids for mass spectrometry.}
 
 \description{
 

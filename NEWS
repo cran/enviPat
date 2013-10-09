@@ -1,0 +1,14 @@
+enviPat News
+
+CHANGES in version 1.2:
+
+	(1) src - new algorithm included for isotope pattern calculation (now algo=1)
+
+	(2) src - existing isotope pattern algorithms debugged and updated (now algo=2 & algo=3)
+
+	(3) data - New Resolution data sets added
+
+	(4) R - check_chemform: chemical formula parsing extended
+
+	(5) R - check_chemform: value: monoisotopic mass instead of mean mass
+

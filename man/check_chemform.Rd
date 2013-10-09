@@ -36,7 +36,7 @@
 Dataframe with 3 columns:
 \item{warning}{Correct chemical formula, \code{FALSE}/\code{TRUE}?}
 \item{new_formula}{Chemical formula}
-\item{mean_mass}{Monoisotopic mass}
+\item{monoisotopic_mass}{Monoisotopic mass}
 }
 
 

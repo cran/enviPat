@@ -22,5 +22,8 @@ struct Element{
 };
 
 int set_element(Element* element, Isotope* isotopes, char* name, int amount, int iso_amount);
+void print_element(Element* element);
+int elements_sort_by_isoamount_inc(const void *a, const void *b);
+int elements_sort_by_isoamount_dec(const void *a, const void *b);
 
 #endif
