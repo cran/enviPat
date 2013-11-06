@@ -6,7 +6,7 @@
 
 \description{
 
-Fast and memory-efficient calculation of isotope patterns (fine structures) for up to very large molecules, based on two different algorithms.
+Fast and memory-efficient calculation of isotope patterns (fine structures) for up to very large molecules, based on three different algorithms.
 Subsequent convolution of isotope patterns with a peak shape function to theoretical envelopes (profiles).
 Based on envelopes, valley detection and centroidization/intensoid calculation.
 Allows for batch processing of chemical formulas and interpolation of measurement resolutions.

@@ -6,8 +6,8 @@
 
 \description{
 The function calculates the isotopic pattern (fine structure) of a given chemical formula or a
-set of chemical formulas (batch calculation), based on two fast and memory efficient algorithms. 
-The second algorithm can handle very large molecules and combinations of elements having many isotopes. 
+set of chemical formulas (batch calculation), based on three fast and memory efficient algorithms. 
+The first algorithm can handle very large molecules and combinations of elements having many isotopes. 
 Returns accurate masses, abundances and isotopic compositions of the individual isotopologues. 
 The isotopes of elements can be defined by the user.
 }
@@ -52,14 +52,13 @@ the occurrence of decreasing branches. The remaining branches are subsequently o
 isotopologue and (b) only contain branches of decreasing abundance. Furthermore, to avoid redundant calculations for transitions of the same isotope 
 (but not the same isotopologues!), this global search is conducted in elementwise subtrees that are then combined.
 
-The second algorithm \code{algo=2} does not use elementwise subtree maximum abundance searches with no differences otherwise to the first algorithm.
+The second algorithm \code{algo=2} does not use elementwise subtree maximum abundance searches with no differences to the first algorithm otherwise.
 
 The third algorithm \code{algo=3} is similar to the one poposed by Li et al. (2010). Herein, mass states and abundances are calculated 
 individually within seperate blocks for each of the elements present in a molecule without (!) abundance thresholds. 
 These building-blocks are then combined to individual isotopologues, with peaks below the threshold abundance evenutally omitted. 
-Herein, a fast calculation of elementwise building-blocks and their combination to isotopologues is implemented so as to avoid redundant 
-calculations from both different updates or different combinations leading to 
-the same isotopologue.
+In the presented version, a fast calculation of elementwise building-blocks and their combination to isotopologues is implemented so as to avoid redundant 
+calculations from both different updates or different combinations leading to the same isotopologue.
 
 }
 
@@ -77,7 +76,7 @@ Each entry in that list contains information on individual isotopologues (rows) 
 
 \references{
 
-Loos, M. & Gerber, C., 201X. Hierarchical network calculation of very large isotope patterns. To be submitted.
+Loos, M. & Gerber, C., 201X. Tree-like hierarchy for the calculation of very large isotope patterns. To be submitted.
 
 Li, L., Karabacak, N., Cobb, J., Wang, Q., Hong, P., agar, J., 2010. Memory-efficient calculation of the isotopic mass states of a molecule.
 Rapid Communications in Mass Spectrometry, 24: 2689-2696.

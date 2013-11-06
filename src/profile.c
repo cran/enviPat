@@ -115,12 +115,20 @@ int calc_profile_with_trace(    int n,
             }
             value += v;
         }
-        
-        if (value > 0.0 || (value == 0.0 && *(profile_a + c - 1) > 0.0)) {
-            *(profile_a + c) = value;
-            *(profile_mass + c) = m;
-            c++;
+        if (c > 0) {
+            if (value > 0.0 || (value == 0.0 && *(profile_a + c - 1) > 0.0)) {
+                *(profile_a + c) = value;
+                *(profile_mass + c) = m;
+                c++;
+            }
+        }else{
+            if (value > 0.0) {
+                *(profile_a + c) = value;
+                *(profile_mass + c) = m;
+                c++;
+            }
         }
+
     }
     
     *profile_n = c;
@@ -224,10 +232,18 @@ int calc_profile(double* m, double* a, double* profile_mass, double* profile_a, 
             }
             value += v;
         }
-        if (value > 0.0 || (value == 0.0 && *(profile_a + c - 1) > 0.0)) {
-            *(profile_a + c) = value;
-            *(profile_mass + c) = m;
-            c++;
+        if (c > 0) {
+            if (value > 0.0 || (value == 0.0 && *(profile_a + c - 1) > 0.0)) {
+                *(profile_a + c) = value;
+                *(profile_mass + c) = m;
+                c++;
+            }
+        }else{
+            if (value > 0.0) {
+                *(profile_a + c) = value;
+                *(profile_mass + c) = m;
+                c++;
+            }
         }
     }
     *num = c;

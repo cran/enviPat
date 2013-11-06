@@ -11,10 +11,10 @@ function(
 
     ############################################################################
     # (1) issue warnings #######################################################
-    if(length(resolution)!=length(pattern) & length(resolution)>1){stop("length of resolution does not match length of pattern list!\n")}
+    if((length(resolution)!=length(pattern)) & length(resolution)>1){stop("length of resolution does not match length of pattern list!\n")}
     if(ppm==TRUE & dmz=="get"){stop("\n WARNING: ppm=TRUE -> dmz must be numerical!\n");}
     if(ppm==TRUE & dmz<0){stop("\n WARNING: ppm=TRUE -> dmz must be >0\n");}
-    if(any(resolution<1)){stop("WARNING: invalid resolution!\n")}
+    if(dmz=="get"){if(any(resolution<1)){stop("WARNING: invalid resolution!\n")}}
     if(env!="Gaussian" & env!="CauchyLorentz"){stop("WARNING: invalid env argument\n")}
     if(ppm!=FALSE & dmz=="get" & frac>1){stop("WARNING: invalid frac argument\n")}
     if(ppm!=FALSE & dmz=="get" & frac<0){stop("WARNING: invalid frac argument\n")}    

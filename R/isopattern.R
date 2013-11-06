@@ -15,9 +15,9 @@ function(
     if(threshold>100 || threshold<0){stop("WARNING: invalid threshold; 0<=threshold<100.\n")}  
     if(plotit!="TRUE"&plotit!="FALSE"){stop("WARNING: plotit invalid. TRUE, FALSE.\n")}
     if(emass!=0.00054858){cat("NOTE: You are sure that is the mass of an electrone?")}
-    if(length(charge)!=length(chemforms) & length(charge)>1){stop("length of charge does not match number of chemforms!\n")}
-    if(charge==0 & charge!=FALSE){stop("WARNING: charge=0?")}
-    if(is.numeric(charge)==FALSE & charge!=FALSE){stop("WARNING: charge either numeric or FALSE!")}
+    if((length(charge)!=length(chemforms)) & length(charge)>1){stop("length of charge does not match number of chemforms!\n")}
+    if(any(charge==0) & any(charge!=FALSE)){stop("WARNING: charge=0?")}
+    if(any(is.numeric(charge)==FALSE) & any(charge!=FALSE)){stop("WARNING: charge either numeric or FALSE!")}
     if(algo!=1 & algo!=2 & algo!=3){stop("invalid algo argument!")}
     options(digits=10);
     ############################################################################

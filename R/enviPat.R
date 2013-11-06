@@ -1,7 +1,7 @@
 .onAttach <- function(lib, pkg)
 {
 
-	packageStartupMessage("\n \n Welcome to enviPat version 1.2 \n \n");
+	packageStartupMessage("\n \n Welcome to enviPat version 1.2 \n Check www.envipat.eawag.ch for an interactive online version\n");
 
 }
 
