@@ -25,7 +25,7 @@
 #define MAX_COMPOUNDS 400000
 
 // allowed size of different compounds
-#define MAX_COMPOUNDS_2 200000
+#define MAX_COMPOUNDS_2 10000
 
 // allowed size of different compounds
 #define MAX_COMPOUNDS_A2 400000

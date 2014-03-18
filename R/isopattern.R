@@ -46,24 +46,27 @@ function(
         s1 = as.character(chemforms[i]),   # chemical formula
         pl = as.integer(1E6),             # number of peaks to be reserved for
         t1 = as.double(threshold),        # relative intensity cutoff
-        iso_list1 = as.character(isolist) # parsed isotope list
-        );
+        iso_list1 = as.character(isolist), # parsed isotope list
+        PACKAGE="enviPat"
+		);
       }
       if(algo==2){
         out <- .Call( "iso_pattern_Call_2",
         s1 = as.character(chemforms[i]),   # chemical formula
         pl = as.integer(1E6),             # number of peaks to be reserved for
         t1 = as.double(threshold),        # relative intensity cutoff
-        iso_list1 = as.character(isolist) # parsed isotope list
-        );
+        iso_list1 = as.character(isolist), # parsed isotope list
+        PACKAGE="enviPat"
+		);
       }
       if(algo==3){
         out <- .Call( "iso_pattern_Call_3",
         s1 = as.character(chemforms[i]),   # chemical formula
         pl = as.integer(1E6),             # number of peaks to be reserved for
         t1 = as.double(threshold),        # relative intensity cutoff
-        iso_list1 = as.character(isolist) # parsed isotope list
-        );
+        iso_list1 = as.character(isolist), # parsed isotope list
+        PACKAGE="enviPat"
+		);
       }
       # parse output ###########################################################
       if(length(out[[1]])==0){

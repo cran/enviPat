@@ -43,7 +43,8 @@ function(
             traceit<-.Call("iso_ppm_Call",
                 as.double((min(m)-extend)),
                 as.double((max(m)+extend)),
-                as.double(dmz)
+                as.double(dmz),
+				PACKAGE="enviPat"
             )
         }else{
           if(dmz!="get"){
@@ -66,7 +67,8 @@ function(
       a1 = as.double(a),
       tr1 = as.double(traceit),
       r1 = as.integer(resolution[i]),
-      t1 = as.double(0)
+      t1 = as.double(0),
+	  PACKAGE="enviPat"
     )
        if(length(out[[1]])==0){
            profiles[[i]]<-"error"

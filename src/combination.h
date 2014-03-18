@@ -23,7 +23,7 @@ typedef struct CombinationMulti_A CombinationMulti_A;
 
 struct Compound{
     unsigned int sum[MAX_ISO_ELEM];
-    double mass;
+	double mass;
     double abundance;
     int counter;
 };
@@ -36,30 +36,29 @@ struct Combination {
     int amount;
 };
 
-struct CompoundMulti{
+struct CompoundMulti{	
+	int sum[MAX_ISO_SIZE];
     unsigned short counter[MAX_ELEMENTS];
-    int sum[MAX_ISO_SIZE];
     double mass;
     double abundance;
     unsigned short indicator_iso;
 };
-
-struct Combination2 {
-    Compound compounds[MAX_COMPOUNDS_2];
-    CompoundMulti a2_list[MAX_COMPOUNDS_A2];
-    int a2_amount;
-    Element element;
-    double max_abundance;
-    double max_mass;
-    int amount;
-};
-
 
 struct CombinationMulti {
     CompoundMulti compounds[MAX_COMPOUNDS];
     double max_abundance;
     double max_mass;
     int amount;
+};
+
+struct Combination2 {
+    Compound compounds[MAX_COMPOUNDS_2];
+    CompoundMulti a2_list[MAX_COMPOUNDS_A2];
+    Element element;
+    double max_abundance;
+    double max_mass;
+    int amount;
+    int a2_amount;
 };
 
 struct CombinationMulti_C {

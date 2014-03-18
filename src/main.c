@@ -22,13 +22,13 @@
 #include "preferences.h"
 
 
-int calc_algo_1(Element *elements, double *mass, double *a, int *cc, int *p_a, double threshold, int i_a,int e_a){
+int calc_algo_1(Element *elements, double *mass, double *a, int *cc, unsigned int *p_a, double threshold, int i_a,int e_a){
 
     unsigned int peak_limit = MAX_PEAKS;
     unsigned int peak_amount = 0;
     
     unsigned short element_amount = e_a;
-    unsigned short mass_amount = 0;
+    //unsigned short mass_amount = 0;
     unsigned short iso_amount = i_a;
     
     double a_max = 1.0;
@@ -36,9 +36,13 @@ int calc_algo_1(Element *elements, double *mass, double *a, int *cc, int *p_a, d
     
     CombinationMulti_A* A = (CombinationMulti_A*)malloc(sizeof(CombinationMulti_A));
     CombinationMulti_C* C = (CombinationMulti_C*)malloc(sizeof(CombinationMulti_C));
-    Combination2* combinations = (Combination2*)malloc(element_amount*sizeof(Combination2));
+    Combination2* combinations = (Combination2*)calloc(element_amount,sizeof(Combination2));
 
     for (unsigned short i = 0; i < element_amount; i++) {
+		
+		//(combinations + i)->compounds->mass = 0.0;
+		//(combinations + i)->compounds->abundance = 0.0;
+		
         calc_combination_max_abundance((combinations + i), (elements + i), threshold,A,C);
         a_max *= (combinations + i)->max_abundance;
     }
@@ -215,12 +219,12 @@ SEXP iso_pattern_Call_2(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
     SEXP list_names;
     int n_c = 2;
     char* names = (char*)malloc((iso_amount + 2) * MAX_NAME_SIZE * sizeof(char));
-    memcpy(names, "mass", MAX_NAME_SIZE * sizeof(char));
-    memcpy(names + MAX_NAME_SIZE, "abundance", MAX_NAME_SIZE * sizeof(char));
+    strncpy(names, "mass\0", 5 * sizeof(char));
+    strncpy(names + MAX_NAME_SIZE, "abundance\0", 10 * sizeof(char));
     
     for (unsigned short e = 0; e < element_amount; e++) {
         for (unsigned short ee = 0; ee < (elements + e)->iso_amount; ee++) {
-            memcpy(names + n_c * MAX_NAME_SIZE, ((elements + e)->isotopes +ee)->isotope, MAX_NAME_SIZE * sizeof(char));
+            strncpy(names + n_c * MAX_NAME_SIZE, ((elements + e)->isotopes +ee)->isotope, MAX_NAME_SIZE * sizeof(char));
             n_c++;
         }
     }
@@ -228,7 +232,7 @@ SEXP iso_pattern_Call_2(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
     PROTECT(list_names = allocVector(STRSXP, iso_amount + 3));
     for(int o = 0; o < n_c; o++){
         char tmp[ MAX_NAME_SIZE ];
-        memcpy(tmp, names + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+        strncpy(tmp, names + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
         SET_STRING_ELT(list_names, o,  mkChar(tmp));
     }
     SET_STRING_ELT(list_names, n_c,  mkChar("NAMES"));
@@ -358,9 +362,9 @@ SEXP iso_pattern_Call_3(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
     
     SEXP list_names;
 
-    char* l_n = (char*)malloc((iso_amount + 2) * MAX_NAME_SIZE * sizeof(char));
-    memcpy(l_n, "mass", MAX_NAME_SIZE * sizeof(char));
-    memcpy(l_n + MAX_NAME_SIZE, "abundance", MAX_NAME_SIZE * sizeof(char));
+    char* l_n = (char*)calloc((iso_amount + 2) * MAX_NAME_SIZE, sizeof(char));
+    strncpy(l_n, "mass\0", 5 * sizeof(char));
+    strncpy(l_n + MAX_NAME_SIZE, "abundance\0", 10* sizeof(char));
     
     int v = 0;
     int index = 0;
@@ -458,7 +462,7 @@ SEXP iso_pattern_Call_3(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
     PROTECT(list_names = allocVector(STRSXP, iso_amount + 3));
     for(int o = 0; o < iso_amount + 2; o++){
         char tmp[ MAX_NAME_SIZE ];
-        memcpy(tmp, l_n + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+        strncpy(tmp, l_n + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
         SET_STRING_ELT(list_names, o,  mkChar(tmp));
     }
     SET_STRING_ELT(list_names, iso_amount + 2,  mkChar("NAMES"));
@@ -536,9 +540,9 @@ SEXP iso_pattern_Call(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list) 
     a = (double*)malloc(p_l * sizeof(double));
     
     SEXP list_names;
-    char* l_n = (char*)malloc((iso_amount + 2) * MAX_NAME_SIZE * sizeof(char));
-    memcpy(l_n, "mass", MAX_NAME_SIZE * sizeof(char));
-    memcpy(l_n + MAX_NAME_SIZE, "abundance", MAX_NAME_SIZE * sizeof(char));
+    char* l_n = (char*)calloc((iso_amount + 2) * MAX_NAME_SIZE, sizeof(char));
+    strncpy(l_n, "mass\0", 5 * sizeof(char));
+    strncpy(l_n + MAX_NAME_SIZE, "abundance\0", 10* sizeof(char));
     
     if(calc_algo_1(elements, mass, a, cc, &peak_amount, t, iso_amount,element_amount)){
         Rprintf("\n ERROR: Unable to calculate isotope pattern\n");
@@ -560,7 +564,7 @@ SEXP iso_pattern_Call(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list) 
     SEXP mass_R;
     SEXP a_R;
     double *p_m_R;
-    double *p_a_R;
+    double *p_a_R; 
     PROTECT(mass_R = NEW_NUMERIC(peak_amount));
     PROTECT(a_R = NEW_NUMERIC(peak_amount));
     p_m_R = NUMERIC_POINTER(mass_R);
@@ -591,7 +595,7 @@ SEXP iso_pattern_Call(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list) 
     PROTECT(list_names = allocVector(STRSXP, iso_amount + 3));
     for(int o = 0; o < iso_amount + 2; o++){
         char tmp[ MAX_NAME_SIZE ];
-        memcpy(tmp, l_n + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+        strncpy(tmp, l_n + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
         SET_STRING_ELT(list_names, o,  mkChar(tmp));
     }
     SET_STRING_ELT(list_names, iso_amount + 2,  mkChar("NAMES"));

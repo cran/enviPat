@@ -23,7 +23,8 @@ function(profiles,detect="centroid",plotit=TRUE){
       out <- .Call("iso_centroid_Call",
       f1 = as.double(p_m),
       a1 = as.double(p_a),
-      t1 = as.integer(return_type)
+      t1 = as.integer(return_type),
+	  PACKAGE="enviPat"
      )
        if(length(out[[1]])==0){
            getlist[[i]]<-"error"

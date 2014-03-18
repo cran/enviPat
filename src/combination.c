@@ -223,14 +223,24 @@ int calc_combination_max_abundance(
     double max_mass = 0.0;
     unsigned int c = 0;
     
-    (combination->compounds + c)->mass = monoisotopic->mass;
-    (combination->compounds + c)->abundance = monoisotopic->abundance;
-    max_a = monoisotopic->abundance;
+    
+    //if(combination->compounds && combination->a2_amount){
+		
+    combination->compounds->mass = monoisotopic->mass;
+    combination->compounds->abundance = monoisotopic->abundance;
+	max_a = monoisotopic->abundance;
     memcpy((combination->compounds + c)->sum, monoisotopic->sum, MAX_ISO_ELEM * sizeof(unsigned int));
     c++;
-    
-    
+ 
     combination->a2_amount = 0;
+    
+	//	}else{
+	//		
+    //                            free(monoisotopic);
+    //                            free(isotopes);
+    //                            free(current_highest);
+    //                            return 0;
+	//		}
     
     unsigned short iso_nr_max = 0;
     while (current->abundance != -1.0) {
@@ -390,8 +400,15 @@ int create_combination_algo_1(      Combination2 *combination,
     unsigned short iso_nr_max = 0;
     unsigned int c = combination->amount;
     
-    *current = combination->a2_list[combination->a2_amount - 1];
-    combination->a2_amount--;
+    if(combination->a2_amount > 0){
+		*current = combination->a2_list[combination->a2_amount - 1];
+		combination->a2_amount--;
+	}else{
+		free(isotopes);
+        free(current);
+        free(current_highest);
+        return 0;
+	}
     
     if (clean_abundance * current->abundance >= threshold && current->mass > 1.0) {
         
@@ -580,7 +597,7 @@ int combine_combinations_algo_1(Combination2* combinations,
         
         mass = 0.0;
         abundance = 1.0;
-        unsigned int last_updated = element_amount - 1;
+        //unsigned int last_updated = element_amount - 1;
         int cc_count = 0;
         int cc_tmp[iso_amount];
         
@@ -645,7 +662,7 @@ int combine_combinations_algo_1(Combination2* combinations,
         for (int k = element_amount - 2; k >= 0; k--) {
             if (tracking[k] < combinations[k].amount) {
                 tracking[k]++;
-                last_updated = k;
+                //last_updated = k;
                 
                 for (int l = k + 1; l < element_amount; l++) {
                     tracking[l] = 0;
@@ -787,11 +804,9 @@ int calc_pattern_algo_2(  double* m,
                             free(isotopes);
                             free(monoisotopic);
                             return 1;
-                        }
-                        
+                        } 
                     }else{
                         if((100/ *max_a) * C->compounds[v].abundance >= threshold) {
-                            
                             A2->compounds[A2->amount] = C->compounds[v];
                             A2->amount++;
                             
