@@ -1,13 +1,13 @@
-4fca01ebeabec99a22a5d416a827fa79 *DESCRIPTION
+d1363fa004e54d0fcd8dcb5d30315d2f *DESCRIPTION
 382f599ab0d564317825c5a7d0aa9803 *NAMESPACE
-a3b4e5caa96e578dd6c5c5ab651312c8 *NEWS
+414fca567f48c3b0fae25f1d487921b0 *NEWS
 e808067a750523b08e71a21a7d1fca80 *R/check_chemform.R
 f2cb8b2bc0b56ea8937b7bbb84bee30c *R/check_ded.R
 ab88b0c3c149f2c120b0340519cc993c *R/check_several.R
 714e724de8f8b80ce1b537f41c544b79 *R/envelope.R
 be12ef2005992f9458f992c4778d01b2 *R/enviPat.R
 8de196a4cfe9f509360c18a30744e5b5 *R/getR.R
-45f9bd3f403758ce4d17880f58303c2c *R/isopattern.R
+2d36b1c701c3d07b5a37922c10c70c3c *R/isopattern.R
 73caa84879fef8fcb458c384b6ab976f *R/isowrap.R
 79ade85166db2075cf0a428c0f9c7476 *R/mergeform.R
 098beb973f1e9baeb052e7cd11596ade *R/multiform.R
@@ -15,7 +15,7 @@ af1a16bd6c0875398c66bce3d4fb335b *R/subform.R
 0a2f51d09d98e4c4aa8ad4d62fd2c302 *R/vdetect.R
 6459214967f390f4998c5e022c51a223 *data/adducts.rda
 0b7cc70df5b94ae93ed1486fd72fb5dc *data/chemforms.rda
-692de11e98973edaa47d233be1114c3e *data/isotopes.rda
+9d0c23b94805e4489144fba6a2f8daa7 *data/isotopes.rda
 67c07029e5846de0018eb1636ac746b0 *data/resolution_list.rda
 ae2b4d8e5d6470d5f22eb0aa4962d45d *man/adducts.Rd
 f34d50e539b94ff3a29ce851a2a6badc *man/check_chemform.Rd
@@ -26,7 +26,7 @@ be9903d2f1eb6baac113085c638a93d6 *man/envelope.Rd
 3098c54a73a34670db14ebf4684749b1 *man/enviPat-package.Rd
 8ae7f01f9289ba813c6dc9e82656ba2c *man/getR.Rd
 d20eb4bcf818ddbcfea7f694c98739c9 *man/isopattern.Rd
-1c8858cc3a67bb30ef8119f7fc531394 *man/isotopes.Rd
+befd60620ba5649810161a5e6b6c51f8 *man/isotopes.Rd
 356e6a8a052762135ff06a9261f368b4 *man/isowrap.Rd
 06628c5e563a6c554174c7c888a090bd *man/mergeform.Rd
 d85dc729db7c27e60e28cef6d24b9a01 *man/multiform.Rd

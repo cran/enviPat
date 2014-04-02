@@ -11,7 +11,7 @@ function(
 
     ############################################################################
     # (1) issue warnings #######################################################
-    if(length(isotopes)!=4){stop("WARNING: invalid isotope list\n")}
+    if(length(isotopes)!=5){stop("WARNING: invalid isotope list\n")}
     if(threshold>100 || threshold<0){stop("WARNING: invalid threshold; 0<=threshold<100.\n")}  
     if(plotit!="TRUE"&plotit!="FALSE"){stop("WARNING: plotit invalid. TRUE, FALSE.\n")}
     if(emass!=0.00054858){cat("NOTE: You are sure that is the mass of an electrone?")}
