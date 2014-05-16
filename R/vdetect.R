@@ -20,29 +20,29 @@ function(profiles,detect="centroid",plotit=TRUE){
         # m:     double array of profile masses
         # a:     double array of profile abundances
         # return type: 0=centroid / 1=intensoid / 2=valley
-      out <- .Call("iso_centroid_Call",
-      f1 = as.double(p_m),
-      a1 = as.double(p_a),
-      t1 = as.integer(return_type),
-	  PACKAGE="enviPat"
-     )
-       if(length(out[[1]])==0){
-           getlist[[i]]<-"error"
-           names(getlist)[i]<-names(profiles)[i]
+		out <- .Call("iso_centroid_Call",
+			f1 = as.double(p_m),
+			a1 = as.double(p_a),
+			t1 = as.integer(return_type),
+			PACKAGE="enviPat"
+		)
+		if(length(out[[1]])==0){
+			getlist[[i]]<-"error"
+			names(getlist)[i]<-names(profiles)[i]
         }else{
-          out2<-data.frame(out[[1]],out[[2]])
-          names(out2)<-c("m/z","abundance")
-          getlist[[i]]<-out2
-          names(getlist)[i]<-names(profiles)[i]
-      if(plotit==TRUE){
-        plot(p_m,p_a,type="h",xlab="m/z",ylab="Relative abundance",main=names(profiles)[i])
-        if(detect=="valley"){
-          points(out[[1]],out[[2]],col="red",type="h")
-        }else{
-          points(out[[1]],out[[2]],col="red",type="h",lwd=2);
-        }
-          }
-    }
+			out2<-data.frame(out[[1]],out[[2]])
+			names(out2)<-c("m/z","abundance")
+			getlist[[i]]<-out2
+			names(getlist)[i]<-names(profiles)[i]
+			if(plotit==TRUE){
+				plot(p_m,p_a,type="h",xlab="m/z",ylab="Relative abundance",main=names(profiles)[i])
+				if(detect=="valley"){
+					points(out[[1]],out[[2]],col="red",type="h")
+				}else{
+					points(out[[1]],out[[2]],col="red",type="h",lwd=2);
+				}
+			}
+		}
     }
     cat(" done.");
     ############################################################################

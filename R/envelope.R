@@ -27,12 +27,12 @@ function(
     # (2) create stick masses ##################################################
     cat("\n Calculate profiles ...");
     if(env=="Gaussian"){
-      type1=0
+		type1=0
     }else{
-      type1=1
+		type1=1
     }
     if(length(resolution)!=length(pattern)){
-      resolution<-rep(resolution,length(pattern))
+		resolution<-rep(resolution,length(pattern))
     }
     profiles<-list(0)
     extend<-c(0.5);
@@ -41,19 +41,20 @@ function(
         a<-pattern[[i]][[2]]
         if(ppm==TRUE){
             traceit<-.Call("iso_ppm_Call",
-                as.double((min(m)-extend)),
+				as.double((min(m)-extend)),
                 as.double((max(m)+extend)),
                 as.double(dmz),
 				PACKAGE="enviPat"
             )
         }else{
-          if(dmz!="get"){
-            traceit<-seq(min(m)-extend,max(m)+extend,dmz);
-          }else{
-            dmz2<-c(mean(m)/resolution[i]);
-            traceit<-seq(min(m)-1,max(m)+extend,dmz2*frac);
-          }          
+			if(dmz!="get"){
+				traceit<-seq(min(m)-extend,max(m)+extend,dmz);
+			}else{
+				dmz2<-c(mean(m)/resolution[i]);
+				traceit<-seq(min(m)-1,max(m)+extend,dmz2*frac);
+			}          
         }
+		
         # m:     double array of the isotope pattern mass
         # a:     double array of the isotope pattern abundance
         # trace:   double array profile masses
@@ -61,27 +62,27 @@ function(
         # type:   Gaussian=0 // Cauchy-Lorentz=1 
         # threshold: threshold value to skip redundant calculation over all mass peaks
         #              if = 0 -> dynamic
-      out <- .Call("iso_profile_with_trace_Call", 
-      type1 = as.integer(type1),
-      f1 = as.double(m),
-      a1 = as.double(a),
-      tr1 = as.double(traceit),
-      r1 = as.integer(resolution[i]),
-      t1 = as.double(0),
-	  PACKAGE="enviPat"
-    )
-       if(length(out[[1]])==0){
-           profiles[[i]]<-"error"
-           names(profiles)[i]<-names(pattern)[i]
+		out <- .Call("iso_profile_with_trace_Call", 
+			type1 = as.integer(type1),
+			f1 = as.double(m),
+			a1 = as.double(a),
+			tr1 = as.double(traceit),
+			r1 = as.integer(resolution[i]),
+			t1 = as.double(0),
+			PACKAGE="enviPat"
+		)
+		if(length(out[[1]])==0){
+			profiles[[i]]<-"error"
+			names(profiles)[i]<-names(pattern)[i]
         }else{
-          out2<-data.frame(out[[1]],out[[2]])
-          names(out2)<-c("m/z","abundance")
-          profiles[[i]]<-out2
-          names(profiles)[i]<-names(pattern)[i]
-      if(plotit==TRUE){
-        plot(out2[,1],out2[,2],type="h",xlab="m/z",ylab="Relative abundance",main=names(pattern)[i])
-      }
-    }
+			out2<-data.frame(out[[1]],out[[2]])
+			names(out2)<-c("m/z","abundance")
+			profiles[[i]]<-out2
+			names(profiles)[i]<-names(pattern)[i]
+			if(plotit==TRUE){
+				plot(out2[,1],out2[,2],type="h",xlab="m/z",ylab="Relative abundance",main=names(pattern)[i])
+			}
+		}
     }
     cat(" done.");
     ############################################################################

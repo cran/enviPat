@@ -1,5 +1,9 @@
 enviPat News
 
+CHANGES in version 1.6:
+
+	(1) data(adducts) - debug of column Mult
+
 CHANGES in version 1.5:
 
 	(1) data isotopes - extended by C-ratio from nontarget package 
