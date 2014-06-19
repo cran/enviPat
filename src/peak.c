@@ -26,5 +26,12 @@ int peak_sort_by_mass(const void *a, const void *b)
 
 int trace_sort_by_mass(const void *a, const void *b)
 {
-    return (*(double*)a - *(double*)b);
+    double y1 = *(double *)a;
+    double y2 = *(double *)b;
+    if (y1 > y2) {
+        return 1;
+    } else if (y1 < y2) {
+        return -1;
+    }
+    return 0;
 }

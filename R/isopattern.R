@@ -6,7 +6,8 @@ function(
   charge=FALSE,
   emass=0.00054858,
   plotit=FALSE,
-  algo=2
+  algo=2,
+  rel_to_mono = FALSE
   ){
 
     ############################################################################
@@ -20,6 +21,7 @@ function(
     if(any(is.numeric(charge)==FALSE) & any(charge!=FALSE)){stop("WARNING: charge either numeric or FALSE!")}
     if(algo!=1 & algo!=2 & algo!=3){stop("invalid algo argument!")}
     options(digits=10);
+	if(rel_to_mono=="TRUE"){rel_to_mono2=1}else{rel_to_mono2=0}
     ############################################################################
     # (2) parse isolist, set charge ############################################
     cat("\n Calculate isotope patterns ...");
@@ -47,6 +49,7 @@ function(
         pl = as.integer(1E6),             # number of peaks to be reserved for
         t1 = as.double(threshold),        # relative intensity cutoff
         iso_list1 = as.character(isolist), # parsed isotope list
+        rtm = as.integer(rel_to_mono2),     # 0:relative to highest, 1:relative to mono peak
         PACKAGE="enviPat"
 		);
       }
@@ -56,6 +59,7 @@ function(
         pl = as.integer(1E6),             # number of peaks to be reserved for
         t1 = as.double(threshold),        # relative intensity cutoff
         iso_list1 = as.character(isolist), # parsed isotope list
+        rtm = as.integer(rel_to_mono2),     # 0:relative to highest, 1:relative to mono peak
         PACKAGE="enviPat"
 		);
       }
@@ -65,6 +69,7 @@ function(
         pl = as.integer(1E6),             # number of peaks to be reserved for
         t1 = as.double(threshold),        # relative intensity cutoff
         iso_list1 = as.character(isolist), # parsed isotope list
+        rtm = as.integer(rel_to_mono2),     # 0:relative to highest, 1:relative to mono peak
         PACKAGE="enviPat"
 		);
       }

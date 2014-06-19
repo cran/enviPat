@@ -13,7 +13,7 @@ The isotopes of elements can be defined by the user.
 }
 
 \usage{isopattern(isotopes, chemforms, threshold = 0.001, charge = FALSE, 
-emass = 0.00054858, plotit = FALSE, algo=2)}
+emass = 0.00054858, plotit = FALSE, algo=2, rel_to_mono = FALSE)}
 
 \arguments{
   
@@ -34,7 +34,9 @@ emass = 0.00054858, plotit = FALSE, algo=2)}
 
 	\item{algo}{Which algorithm to use? Type \code{1} or \code{2}. See details.}
 
+	\item{rel_to_mono}{Should abundances be normalized relative to the monoisotopic instead of the most abundant peak, \code{TRUE/FALSE}?}
 }
+
 
 
 \details{
@@ -60,6 +62,7 @@ These building-blocks are then combined to individual isotopologues, with peaks 
 In the presented version, a fast calculation of elementwise building-blocks and their combination to isotopologues is implemented so as to avoid redundant 
 calculations from both different updates or different combinations leading to the same isotopologue.
 
+Note that when \code{rel_to_mono} is set to \code{TRUE}, the abundance \code{threshold} is specified relative to the monoisotopic instead of the most abundant peak.
 }
 
 
@@ -99,7 +102,7 @@ For correct adduct isotope pattern calculations, please check \code{\link[enviPa
 \section{warning}{
 
 Too low values for \code{threshold} may lead to unnecessary calculation of low abundance peaks - to the extent that not enough memory is available 
-for either of the two algorithms . 
+for either of the two algorithms. This is especially critial if \code{rel_to_mono} is set to \code{TRUE}.
 
 }
 

@@ -34,6 +34,8 @@ OrbitrapXL,Velos,VelosPro/R15000@400
 
 OrbitrapXL,Velos,VelosPro/R7500@400
 
+Q-Exactive,ExactivePlus/280K@200
+
 Q-Exactive,ExactivePlus/R140000@200
 
 Q-Exactive,ExactivePlus/R70000@200

@@ -102,6 +102,21 @@ int calc_combination_max_abundance(Combination2* combination,
                                    double threshold,
                                    CombinationMulti_A* A,
                                    CombinationMulti_C* C);
+                                   
+int calc_combination_max_abundance_mono(Combination2* combination,
+									Element *element,
+									double threshold,
+									CombinationMulti_A* A,
+									CombinationMulti_C* C,
+									double mono_abundance);
+
+int create_combination_algo_1_mono(   Combination2 *combination,
+                                 Element *element,
+                                 double threshold,
+                                 int peak_limit,
+                                 CombinationMulti_A* A,
+                                 CombinationMulti_C* C,
+                                 double mono_abundance);
 
 int create_combination_algo_1(   Combination2 *combination,
                                  Element *element,
@@ -132,6 +147,17 @@ int calc_pattern_algo_2(double* m,
                          double threshold,
                          unsigned int* peak_amount,
                          int peak_limit);
+                         
+int calc_pattern_algo_2_mono(double* m,
+                         double* a,
+                         int *cc,
+                         double* max_a,
+                         Element *elements,
+                         int element_amount,
+                         double threshold,
+                         unsigned int* peak_amount,
+                         int peak_limit,
+                         double mono_abundance);
 
 int clean_combinations_2(Combination2* combinations,
                          double threshold,

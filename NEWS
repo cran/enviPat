@@ -1,5 +1,10 @@
 enviPat News
 
+CHANGES in version 1.7:
+
+	(1) data - New Resolution data set added
+	(2) src - Normalization to monoisotopic peak abundance can now be enforced, even if this peak is not the most abundant one.  
+
 CHANGES in version 1.6:
 
 	(1) data(adducts) - debug of column Mult

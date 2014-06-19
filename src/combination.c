@@ -10,6 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <R.h>
+#include <Rdefines.h>
+
 
 #include "element.h"
 #include "combination.h"
@@ -369,6 +372,386 @@ int calc_combination_max_abundance(
     return 0;
 }
 
+
+int calc_combination_max_abundance_mono(
+                                   Combination2* combination,
+                                   Element *element,
+                                   double threshold,
+                                   CombinationMulti_A* A,
+                                   CombinationMulti_C* C,
+                                   double mono_abundance)
+{
+    Isotope2 *isotopes = (Isotope2*)malloc(MAX_ISO_SIZE * sizeof(Isotope2));
+    CompoundMulti* monoisotopic = (CompoundMulti*)calloc(1,sizeof(CompoundMulti));
+    
+    int iso_c = 0;
+    create_isotope_list_single(element, isotopes, &iso_c);
+    calc_monoisotopic_single(element, monoisotopic);
+    
+    A->amount = 0;
+    A->max_mass = 0.0;
+    A->max_abundance = 1.0;
+    
+    C->amount = 0;
+    C->max_mass = 0.0;
+    C->max_abundance = 1.0;
+    
+    CompoundMulti* current_highest = (CompoundMulti*)malloc(sizeof(CompoundMulti));
+    CompoundMulti* current = NULL;
+    
+    current = monoisotopic;
+    
+    double max_a = 0.0;
+    double max_mass = 0.0;
+    unsigned int c = 0;
+    
+    
+    //if(combination->compounds && combination->a2_amount){
+		
+    combination->compounds->mass = monoisotopic->mass;
+    combination->compounds->abundance = monoisotopic->abundance;
+	max_a = monoisotopic->abundance;
+    memcpy((combination->compounds + c)->sum, monoisotopic->sum, MAX_ISO_ELEM * sizeof(unsigned int));
+    c++;
+ 
+    combination->a2_amount = 0;
+    
+	//	}else{
+	//		
+    //                            free(monoisotopic);
+    //                            free(isotopes);
+    //                            free(current_highest);
+    //                            return 0;
+	//		}
+    
+    unsigned short iso_nr_max = 0;
+    while (current->abundance != -1.0) {
+        *current_highest = *current;
+        C->amount = 0;
+        iso_nr_max = 0;
+        
+        for (unsigned short j = current->indicator_iso; j < iso_c; j++) {
+            if ( current->counter[0] < element->amount ) {
+                
+                Isotope *isotope = element->isotopes;
+                unsigned short iso_e_nr = (isotopes + j)->iso_e_nr;
+                C->compounds[C->amount] = *current;
+                CompoundMulti *comp = &C->compounds[C->amount];
+                
+                comp->counter[0]++;
+                comp->indicator_iso = j;
+                comp->sum[iso_e_nr]++;
+                
+                comp->mass -= isotope->mass;
+                comp->mass += (isotope + iso_e_nr)->mass;
+                
+                comp->abundance *= ( isotope + iso_e_nr)->abundance * (comp->sum[0]);
+                comp->abundance /= ( isotope )->abundance * comp->sum[iso_e_nr];
+                
+                comp->sum[0]--;
+                
+                if (current_highest->abundance < comp->abundance) {
+                    *current_highest = *comp;
+                }
+                
+                if (comp->abundance >= current->abundance) {
+                    iso_nr_max = j;
+                }
+                
+                C->amount++;
+            }
+        }
+        
+        if (max_a < current_highest->abundance) {
+            max_a = current_highest->abundance;
+            max_mass = current_highest->mass;
+        }
+        
+        if(current_highest->abundance > current->abundance){
+            for (int v = C->amount - 1; v >= 0 ; v--) {
+                if ( C->compounds[v].abundance != current_highest->abundance
+                    ) {
+                    if(C->compounds[v].indicator_iso <= iso_nr_max) {
+                        A->compounds[A->amount] = C->compounds[v];
+                        A->amount++;
+                        
+                        if (A->amount > MAX_COMPOUNDS_A) {
+                            //printf("reached limit for A list\n");
+                            free(isotopes);
+                            free(monoisotopic);
+                            free(current_highest);
+                            return 1;
+                        }
+                    }else{
+                        if ( (100/ mono_abundance) * C->compounds[v].abundance >= threshold) {
+                            combination->a2_list[combination->a2_amount] = C->compounds[v];
+                            combination->a2_amount++;
+                            
+                            if (combination->a2_amount > MAX_COMPOUNDS_A2) {
+                                combination->amount = c;
+                                free(monoisotopic);
+                                free(isotopes);
+                                free(current_highest);
+                                return 1;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            *current = *current_highest;
+            if ((100/ mono_abundance) * current_highest->abundance >= threshold) {
+                (combination->compounds + c)->mass = current_highest->mass;
+                (combination->compounds + c)->abundance =  current_highest->abundance;
+                memcpy((combination->compounds + c)->sum, current_highest->sum, MAX_ISO_ELEM * sizeof(unsigned int));
+                c++;
+            }
+        }
+        else{
+            for (int v = 0; v < C->amount; v++) {
+                if ( (100/ mono_abundance) * C->compounds[v].abundance >= threshold) {
+                    combination->a2_list[combination->a2_amount] = C->compounds[v];
+                    combination->a2_amount++;
+                    
+                    if (combination->a2_amount > MAX_COMPOUNDS_A2) {
+                        combination->amount = c;
+                        free(monoisotopic);
+                        free(isotopes);
+                        free(current_highest);
+                        return 1;
+                    }
+                }
+            }
+            
+            if (A->amount > 0) {
+                CompoundMulti *a_c = &A->compounds[A->amount - 1];
+                *current = *a_c;
+                if ((100/ mono_abundance) * a_c->abundance >= threshold) {
+                    (combination->compounds + c)->mass = a_c->mass;
+                    (combination->compounds + c)->abundance =  a_c->abundance;
+                    memcpy((combination->compounds + c)->sum, a_c->sum, MAX_ISO_ELEM * sizeof(unsigned int));
+                    c++;
+                }
+                A->amount--;
+            }else if(A->amount == 0){
+                break;
+                
+            }else {
+                current->abundance = -1.0;
+            }
+        }
+    }
+    combination->max_abundance = max_a;
+    combination->max_mass = max_mass;
+    combination->amount = c;
+    free(isotopes);
+    free(monoisotopic);
+    free(current_highest);
+    
+    return 0;
+}
+
+int create_combination_algo_1_mono( Combination2 *combination,
+                                    Element *element,
+                                    double threshold,
+                                    int peak_limit,
+                                    CombinationMulti_A* A,
+                                    CombinationMulti_C* C,
+                                    double mono_abundance
+                         )
+{
+    
+    Isotope2 *isotopes = (Isotope2*)malloc(MAX_ISO_SIZE * sizeof(Isotope2));
+     
+    int iso_c = 0;
+    create_isotope_list_single(element, isotopes, &iso_c);
+    
+    A->amount = 0;
+    A->max_mass = 0.0;
+    A->max_abundance = 1.0;
+    
+    C->amount = 0;
+    C->max_mass = 0.0;
+    C->max_abundance = 1.0;
+    
+    combination->element = *element;
+    
+    CompoundMulti* current_highest = (CompoundMulti*)malloc(sizeof(CompoundMulti));
+    CompoundMulti* current = (CompoundMulti*)malloc(sizeof(CompoundMulti));
+    
+    unsigned short iso_nr_max = 0;
+    unsigned int c = combination->amount;
+    
+    if(combination->a2_amount > 0){
+		*current = combination->a2_list[combination->a2_amount - 1];
+		combination->a2_amount--;
+	}else{
+		free(isotopes);
+        free(current);
+        free(current_highest);
+        return 0;
+	}
+    
+    if (current->abundance >= threshold && current->mass > 1.0) {
+        
+        (combination->compounds + c)->mass = current->mass;
+        (combination->compounds + c)->abundance =  current->abundance;
+        memcpy((combination->compounds + c)->sum, current->sum, MAX_ISO_ELEM * sizeof(unsigned int));
+        c++;
+    }
+    
+    while (current->abundance != -1.0) {
+        *current_highest = *current;
+        C->amount = 0;
+        iso_nr_max = 0;
+        
+        for (unsigned short j = current->indicator_iso; j < iso_c; j++) {
+            
+            if ( current->counter[0] < element->amount ) {
+                
+                Isotope *isotope = element->isotopes;
+                unsigned short iso_e_nr = (isotopes + j)->iso_e_nr;
+                C->compounds[C->amount] = *current;
+                CompoundMulti *comp = &C->compounds[C->amount];
+                
+                comp->counter[0]++;
+                comp->indicator_iso = j;
+                comp->sum[iso_e_nr]++;
+                
+                comp->mass -= isotope->mass;
+                comp->mass += (isotope + iso_e_nr)->mass;
+                
+                comp->abundance *= ( isotope + iso_e_nr)->abundance * (comp->sum[0]);
+                comp->abundance /= ( isotope )->abundance * comp->sum[0 + iso_e_nr];
+                
+                comp->sum[0]--;
+                
+                if (current_highest->abundance < comp->abundance) {
+                    *current_highest = *comp;
+                }
+                
+                if (comp->abundance >= current->abundance) {
+                    iso_nr_max = j;
+                }
+                
+                C->amount++;
+            }
+        }
+        
+        if (c > MAX_COMPOUNDS_2 || combination->amount > MAX_COMPOUNDS_2) {
+            combination->amount = c;
+            free(isotopes);
+            free(current);
+            free(current_highest);
+            //printf("exeeded combination amount\n");
+            return 1;
+        }
+        
+        if (combination->max_abundance < current_highest->abundance) {
+            combination->max_abundance = current_highest->abundance;
+        }
+        
+        if(current_highest->abundance > current->abundance){
+            
+            for (int v = C->amount - 1; v >= 0 ; v--) {
+                if ( C->compounds[v].abundance != current_highest->abundance
+                    ) {
+                    if(C->compounds[v].indicator_iso <= iso_nr_max) {
+                        A->compounds[A->amount] = C->compounds[v];
+                        A->amount++;
+                        
+                        if (A->amount > MAX_COMPOUNDS_A) {
+                            combination->amount = c;
+                            free(isotopes);
+                            free(current);
+                            free(current_highest);
+                            return 1;
+                        }
+                        
+                    }else{
+                        if(C->compounds[v].abundance >= threshold) {
+                            
+                            combination->a2_list[combination->a2_amount] = C->compounds[v];
+                            combination->a2_amount++;
+                            
+                            if (combination->a2_amount > MAX_COMPOUNDS_A2) {
+                                combination->amount = c;
+                                free(isotopes);
+                                free(current);
+                                free(current_highest);
+                                return 1;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            *current = *current_highest;
+            if (current_highest->abundance >= threshold && c < MAX_COMPOUNDS_2) {
+                (combination->compounds + c)->mass = current_highest->mass;
+                (combination->compounds + c)->abundance =  current_highest->abundance;
+                memcpy((combination->compounds + c)->sum, current_highest->sum, MAX_ISO_ELEM * sizeof(unsigned int));
+                c++;
+            }
+        }
+        else{
+            for (int v = 0; v < C->amount; v++) {
+                if ( C->compounds[v].abundance >= threshold ) {
+                    
+                    combination->a2_list[combination->a2_amount] = C->compounds[v];
+                    combination->a2_amount++;
+                    
+                    if (combination->a2_amount > MAX_COMPOUNDS_A2) {
+                        combination->amount = c;
+                        free(isotopes);
+                        free(current);
+                        free(current_highest);
+                        return 1;
+                    }
+                }
+            }
+            
+            if (A->amount > 0) {
+                CompoundMulti *a_c = &A->compounds[A->amount - 1];
+                *current = *a_c;
+                
+                if (c > peak_limit-1) {
+                    break;
+                }
+                
+                if (a_c->abundance >= threshold && c < MAX_COMPOUNDS_2) {
+                    
+                    (combination->compounds + c)->mass = a_c->mass;
+                    (combination->compounds + c)->abundance =  a_c->abundance;
+                    memcpy((combination->compounds + c)->sum, a_c->sum, MAX_ISO_ELEM * sizeof(unsigned int));
+                    
+                    c++;
+                }
+                A->amount--;
+            }else if(A->amount == 0 && combination->a2_amount > 0){
+                CompoundMulti *a2 = &combination->a2_list[combination->a2_amount - 1];
+                *current = *a2;
+                if ( a2->abundance >= threshold && c < MAX_COMPOUNDS_2) {
+                    (combination->compounds + c)->mass = a2->mass;
+                    (combination->compounds + c)->abundance =  a2->abundance;
+                    memcpy((combination->compounds + c)->sum, a2->sum, MAX_ISO_ELEM * sizeof(unsigned int));
+                    c++;
+                }
+                combination->a2_amount--;
+                
+            }else {
+                current->abundance = -1.0;
+            }
+        }
+    }
+    combination->amount = c;
+    free(isotopes);
+    free(current);
+    free(current_highest);
+   	return 0;
+}
+
+
 int create_combination_algo_1(      Combination2 *combination,
                                     Element *element,
                                     double clean_abundance,
@@ -409,6 +792,9 @@ int create_combination_algo_1(      Combination2 *combination,
         free(current_highest);
         return 0;
 	}
+    
+    
+    //clean_abundance = a_max/(combinations + j)->max_abundance;
     
     if (clean_abundance * current->abundance >= threshold && current->mass > 1.0) {
         
@@ -870,6 +1256,220 @@ int calc_pattern_algo_2(  double* m,
                 current = a2;
                 
                 if ( (100/ *max_a) * a2->abundance >= threshold ) {
+                    *(m + c) = a2->mass;
+                    *(a + c) = a2->abundance;
+                    memcpy((cc + c * MAX_ISO_SIZE), a2->sum, MAX_ISO_SIZE * sizeof(int));
+                    c++;
+                }
+                A2->amount--;
+                
+            }else {
+                current->abundance = -1.0;
+            }
+        }
+    }
+    *peak_amount =  c;
+    
+    free(A);
+    free(A2);
+    free(C);
+    free(isotopes);
+    free(monoisotopic);
+   	return 0;
+}
+
+
+int calc_pattern_algo_2_mono(  double* m,
+                          double* a,
+                          int *cc,
+                          double* max_a,
+                          Element *elements,
+                          int element_amount,
+                          double threshold,
+                          unsigned int* peak_amount,
+                          int peak_limit,
+                          double mono_abundance
+                        )
+{
+    
+    Isotope2 *isotopes = (Isotope2*)malloc(MAX_ISO_SIZE * sizeof(Isotope2));
+    CompoundMulti* monoisotopic = (CompoundMulti*)calloc(1,sizeof(CompoundMulti));
+    
+    CombinationMulti_A* A = (CombinationMulti_A*)malloc(sizeof(CombinationMulti_A));
+    CombinationMulti* A2 = (CombinationMulti*)malloc(sizeof(CombinationMulti));
+    CombinationMulti_C* C = (CombinationMulti_C*)malloc(sizeof(CombinationMulti_C));
+    
+    int iso_c = 0;
+    create_isotope_list(elements, element_amount, isotopes, &iso_c);
+    calc_monoisotopic(elements, element_amount, monoisotopic);
+    
+    A->amount = 0;
+    A->max_mass = 0.0;
+    A->max_abundance = 1.0;
+    
+    A2->amount = 0;
+    A2->max_mass = 0.0;
+    A2->max_abundance = 1.0;
+    
+    C->amount = 0;
+    C->max_mass = 0.0;
+    C->max_abundance = 1.0;
+    
+    *m = monoisotopic->mass;
+    *a = monoisotopic->abundance;
+    *max_a = monoisotopic->abundance;
+    memcpy(cc, monoisotopic->sum, MAX_ISO_SIZE * sizeof(int));
+    
+    CompoundMulti* current_highest = NULL;
+    CompoundMulti* current = NULL;
+    
+    current = monoisotopic;
+    unsigned short iso_pos[MAX_ELEMENTS];
+    for (unsigned short d = 0; d < element_amount; d++) {
+        iso_pos[d] = 0;
+        for (unsigned short b = 0; b < d; b++) {
+            iso_pos[d] += (elements + b)->iso_amount;
+        }
+    }
+    
+    unsigned short iso_nr_max = 0;
+    unsigned int c = 1;
+    unsigned short h = 0;
+    while (current->abundance != -1.0) {
+        current_highest = current;
+        C->amount = 0;
+        iso_nr_max = 0;
+        
+        for (unsigned short j = current->indicator_iso; j < iso_c; j++) {
+            h = (isotopes + j)->element_nr;
+            
+            if ( current->counter[h] < (elements + h)->amount ) {
+                
+                Isotope *isotope = (elements + h)->isotopes;
+                unsigned short iso_e_nr = (isotopes + j)->iso_e_nr;
+                C->compounds[C->amount] = *current;
+                CompoundMulti *comp = &C->compounds[C->amount];
+                
+                comp->counter[h]++;
+                comp->indicator_iso = j;
+                comp->sum[iso_pos[h] + iso_e_nr]++;
+                
+                comp->mass -= isotope->mass;
+                comp->mass += (isotope + iso_e_nr)->mass;
+                
+                comp->abundance *= ( isotope + iso_e_nr)->abundance * (comp->sum[iso_pos[h]]);
+                comp->abundance /= ( isotope )->abundance * comp->sum[iso_pos[h] + iso_e_nr];
+                
+                comp->sum[iso_pos[h]]--;
+                
+                if (current_highest->abundance < comp->abundance) {
+                    current_highest = comp;
+                }
+                
+                if (comp->abundance >= current->abundance) {
+                    iso_nr_max = j;
+                }
+                
+                C->amount++;
+            }
+        }
+        
+        if (c > peak_limit) {
+            *peak_amount = c;
+            free(A);
+            free(A2);
+            free(C);
+            free(isotopes);
+            free(monoisotopic);
+            return 1;
+        }
+        
+        if(current_highest->abundance > current->abundance){
+            if (*max_a < current_highest->abundance) {
+                *max_a = current_highest->abundance;
+            }
+            
+            for (int v = C->amount - 1; v >= 0 ; v--) {
+                if ( C->compounds[v].abundance != current_highest->abundance
+                    ) {
+                    if(C->compounds[v].indicator_iso < iso_nr_max) {
+                        A->compounds[A->amount] = C->compounds[v];
+                        A->amount++;
+                        
+                        if (A->amount > MAX_COMPOUNDS) {
+                            *peak_amount = c;
+                            free(A);
+                            free(A2);
+                            free(C);
+                            free(isotopes);
+                            free(monoisotopic);
+                            return 1;
+                        } 
+                    }else{
+                        if((100/ mono_abundance) * C->compounds[v].abundance >= threshold) {
+                            A2->compounds[A2->amount] = C->compounds[v];
+                            A2->amount++;
+                            
+                            if (A2->amount > MAX_COMPOUNDS) {
+                                *peak_amount = c;
+                                free(A);
+                                free(A2);
+                                free(C);
+                                free(isotopes);
+                                free(monoisotopic);
+                                return 1;
+                            }
+                        }
+                    }
+                }else{
+                    C->compounds[C->amount] = C->compounds[v];
+                    current_highest = &C->compounds[C->amount];
+                }
+            }
+            
+            current = current_highest;
+            
+            if ((100/ mono_abundance) * current_highest->abundance >= threshold) {
+                *(m + c) = current_highest->mass;
+                *(a + c) = current_highest->abundance;
+                memcpy((cc + c * MAX_ISO_SIZE), current_highest->sum, MAX_ISO_SIZE * sizeof(int));
+                c++;
+            }
+        }
+        else{
+            for (int v = 0; v < C->amount; v++) {
+                if ( (100/ mono_abundance) * C->compounds[v].abundance >= threshold ) {
+                    A2->compounds[A2->amount] = C->compounds[v];
+                    A2->amount++;
+                    
+                    if (A2->amount > MAX_COMPOUNDS) {
+                        *peak_amount = c;
+                        free(A);
+                        free(A2);
+                        free(C);
+                        free(isotopes);
+                        free(monoisotopic);
+                        return 1;
+                    }
+                }
+            }
+            
+            if (A->amount > 0) {
+                CompoundMulti *a_c = &A->compounds[A->amount - 1];
+                current = a_c;
+                
+                if ((100/ mono_abundance) * a_c->abundance >= threshold) {
+                    *(m + c) = a_c->mass;
+                    *(a + c) = a_c->abundance;
+                    memcpy((cc + c * MAX_ISO_SIZE), a_c->sum, MAX_ISO_SIZE * sizeof(int));
+                    c++;
+                }
+                A->amount--;
+            }else if(A->amount == 0 && A2->amount > 0){
+                CompoundMulti *a2 = &A2->compounds[A2->amount - 1];
+                current = a2;
+                
+                if ( (100/ mono_abundance) * a2->abundance >= threshold ) {
                     *(m + c) = a2->mass;
                     *(a + c) = a2->abundance;
                     memcpy((cc + c * MAX_ISO_SIZE), a2->sum, MAX_ISO_SIZE * sizeof(int));
