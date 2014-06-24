@@ -7,7 +7,8 @@ function(
   emass=0.00054858,
   plotit=FALSE,
   algo=2,
-  rel_to_mono = FALSE
+  rel_to_mono = FALSE,
+  verbose = TRUE
   ){
 
     ############################################################################
@@ -22,9 +23,10 @@ function(
     if(algo!=1 & algo!=2 & algo!=3){stop("invalid algo argument!")}
     options(digits=10);
 	if(rel_to_mono=="TRUE"){rel_to_mono2=1}else{rel_to_mono2=0}
+	if(!is.logical(verbose)){stop("invalid verbose")}
     ############################################################################
     # (2) parse isolist, set charge ############################################
-    cat("\n Calculate isotope patterns ...");
+    if(verbose){cat("\n Calculate isotope patterns ...")}
     isolist<-""
     for(i in 1:length(isotopes[,1])){
       getit<-as.character(i)
@@ -76,29 +78,31 @@ function(
       # parse output ###########################################################
       if(length(out[[1]])==0){
          pattern[[i]]<-"error";
-         names(pattern)[i]<-chemforms[i]
       }else{
-        out2<-as.data.frame(out[[1]])
-        for(j in 2:(length(out)-1)){
-            out2<-cbind(out2,out[[j]])
+		lengit<-length(out$NAMES)
+		out2<-matrix(ncol=(lengit-1),nrow=length(out$mass))
+        for(j in 1:(lengit-1)){
+            out2[,j]<-out[[j]]
         }
-        out2<-out2[order(out2[,1],decreasing=FALSE),]
-        names(out2)<-out[[length(out)]][-length(out[[length(out)]])]
-        names(out2)[1]<-"m/z"
+		out2<-out2[order(out2[,1],decreasing=FALSE),]
+		colnames(out2)<-out$NAMES[-lengit]
+        colnames(out2)[1]<-"m/z"
         if(charge[i]!=FALSE){
-          out2[,1]<-c(out2[,1]-(charge[i]*emass));  # electrone mass
-          out2[,1]<-c(out2[,1]/abs(charge[i]));  # /charge=z
-        }
+			out2[,1]<-c(out2[,1]-(charge[i]*emass));  # electrone mass
+			if(charge[i]!=1){
+				out2[,1]<-c(out2[,1]/abs(charge[i]));  # /charge=z
+			}
+		}
         pattern[[i]]<-out2
-        names(pattern)[i]<-as.character(chemforms[i]);
         if(plotit==TRUE){
             plot(out2[,1],out2[,2],type="h",
             xlab="m/z",ylab="Relative abundance",main=names(pattern)[i])
         }
       }  
-  }  
-  cat(" done.");
-  ############################################################################
+  }
+  names(pattern)<-as.character(chemforms);
+  if(verbose){cat(" done.");}
+  ############################################################################ 
   # (3) output ###############################################################
   return(pattern)
   ############################################################################

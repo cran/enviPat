@@ -13,7 +13,7 @@ The isotopes of elements can be defined by the user.
 }
 
 \usage{isopattern(isotopes, chemforms, threshold = 0.001, charge = FALSE, 
-emass = 0.00054858, plotit = FALSE, algo=2, rel_to_mono = FALSE)}
+emass = 0.00054858, plotit = FALSE, algo=2, rel_to_mono = FALSE, verbose = TRUE)}
 
 \arguments{
   
@@ -35,6 +35,8 @@ emass = 0.00054858, plotit = FALSE, algo=2, rel_to_mono = FALSE)}
 	\item{algo}{Which algorithm to use? Type \code{1} or \code{2}. See details.}
 
 	\item{rel_to_mono}{Should abundances be normalized relative to the monoisotopic instead of the most abundant peak, \code{TRUE/FALSE}?}
+
+	\item{verbose}{Verbose, \code{TRUE/FALSE}?}
 }
 
 

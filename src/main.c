@@ -108,7 +108,6 @@ int calc_algo_1(Element *elements, double *mass, double *a, int *cc, unsigned in
 		}
 	}
     
-    Rprintf("\n\nALGO 1   peak amount %d\n\n", peak_amount);
     *p_a = peak_amount;
     
     free(combinations);
@@ -302,8 +301,6 @@ SEXP iso_pattern_Call_2(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
     SET_STRING_ELT(list_names, n_c,  mkChar("NAMES"));
     setAttrib(iso_pattern, R_NamesSymbol, list_names);
     SET_VECTOR_ELT(iso_pattern, n_c, list_names);
-    
-    Rprintf("\n\nALGO 2     peak amount %d\n",peak_amount);
     
     free(elements);
     free(mass);
@@ -507,7 +504,6 @@ SEXP iso_pattern_Call_3(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
     
     
     peak_amount = v;
-    Rprintf("\n\nALGO 3     peak amount %d\n",peak_amount);
     
     SEXP iso_pattern = PROTECT(allocVector(VECSXP, 3 + iso_amount));
     SEXP mass_R;
@@ -784,7 +780,6 @@ SEXP iso_centroid_Call(SEXP profile_mass, SEXP profile_abundance, SEXP type) {
 						*(c_m + j) = centroid/sum_sticks;
 						j++;
 						centroid_count++;
-                        Rprintf("\n    mmmm%d   %d  %e\n",  i, n - step - 1,*(p_a + i));
                     }
                 }
                 centroid = 0.0;

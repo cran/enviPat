@@ -6,7 +6,7 @@
 
 \description{Checks envelopes calculated by \code{\link[enviPat]{envelope}} for valleys and extracts centroids or intensoids.}
 
-\usage{vdetect(profiles,detect="centroid",plotit=TRUE)}
+\usage{vdetect(profiles,detect="centroid",plotit=TRUE,verbose=TRUE)}
 
 
 \arguments{
@@ -16,6 +16,8 @@
 	\item{detect}{To return either \code{"centroid"}, \code{"intensoid"} or \code{"valley"}.}
 
 	\item{plotit}{Should results be plotted, \code{TRUE/FALSE}?}
+	
+	\item{verbose}{Verbose, \code{TRUE/FALSE}?}
 
 }
 

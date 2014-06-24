@@ -1,5 +1,10 @@
 enviPat News
 
+CHANGES in version 1.8:
+
+	(1) debug src Rprintf
+	(2) List entries changed to as.matrix, replacing data.frames 
+
 CHANGES in version 1.7:
 
 	(1) data - New Resolution data set added

@@ -11,7 +11,7 @@ The envelope is represented by sticks, i.e. measurement abundances at discrete m
 }
 
 \usage{envelope(pattern, ppm = FALSE, dmz = "get", frac = 1/4, env = "Gaussian", 
-resolution = 5e+05, plotit = FALSE)}
+resolution = 5e+05, plotit = FALSE, verbose = TRUE)}
 
 
 \arguments{
@@ -32,7 +32,8 @@ resolution = 5e+05, plotit = FALSE)}
 	Check resolution definition in the details section.}
 
   \item{plotit}{Should results be plotted, \code{TRUE/FALSE} ?}
-
+  
+  \item{verbose}{Verbose, \code{TRUE/FALSE}?}
 }
 
 

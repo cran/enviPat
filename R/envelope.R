@@ -6,7 +6,8 @@ function(
     frac=1/4,
     env="Gaussian",
     resolution=5E5,
-    plotit=FALSE
+    plotit=FALSE,
+	verbose = TRUE
 ){
 
     ############################################################################
@@ -19,13 +20,14 @@ function(
     if(ppm!=FALSE & dmz=="get" & frac>1){stop("WARNING: invalid frac argument\n")}
     if(ppm!=FALSE & dmz=="get" & frac<0){stop("WARNING: invalid frac argument\n")}    
     if(is.list(pattern)==FALSE){stop("WARNING: pattern must be a list\n")}
-    if(length(pattern[[1]])<3 || names(pattern[[1]])[1:2]!=c("m/z","abundance")){stop("WARNING: is list, but has invalid entries\n")}
+    if(length(pattern[[1]])<3 || colnames(pattern[[1]])[1:2]!=c("m/z","abundance")){stop("WARNING: is list, but has invalid entries\n")}
     if(ppm!="TRUE"&ppm!="FALSE"){stop("WARNING: ppm invalid\n")}
     if(plotit!="TRUE"&plotit!="FALSE"){stop("WARNING: plotit invalid. TRUE, FALSE.\n")}
+	if(!is.logical(verbose)){stop("invalid verbose")}
     options(digits=10);
     ############################################################################
     # (2) create stick masses ##################################################
-    cat("\n Calculate profiles ...");
+    if(verbose){cat("\n Calculate profiles ...")}
     if(env=="Gaussian"){
 		type1=0
     }else{
@@ -37,8 +39,8 @@ function(
     profiles<-list(0)
     extend<-c(0.5);
     for(i in 1:length(pattern)){
-        m<-pattern[[i]][[1]]   
-        a<-pattern[[i]][[2]]
+        m<-pattern[[i]][,1]   
+        a<-pattern[[i]][,2]
         if(ppm==TRUE){
             traceit<-.Call("iso_ppm_Call",
 				as.double((min(m)-extend)),
@@ -54,7 +56,6 @@ function(
 				traceit<-seq(min(m)-1,max(m)+extend,dmz2*frac);
 			}          
         }
-		
         # m:     double array of the isotope pattern mass
         # a:     double array of the isotope pattern abundance
         # trace:   double array profile masses
@@ -73,18 +74,19 @@ function(
 		)
 		if(length(out[[1]])==0){
 			profiles[[i]]<-"error"
-			names(profiles)[i]<-names(pattern)[i]
-        }else{
-			out2<-data.frame(out[[1]],out[[2]])
-			names(out2)<-c("m/z","abundance")
+        }else{	
+			out2<-matrix(ncol=2,nrow=length(out[[1]]))
+			out2[,1]<-out[[1]]
+			out2[,2]<-out[[2]]
+			colnames(out2)<-c("m/z","abundance")
 			profiles[[i]]<-out2
-			names(profiles)[i]<-names(pattern)[i]
 			if(plotit==TRUE){
 				plot(out2[,1],out2[,2],type="h",xlab="m/z",ylab="Relative abundance",main=names(pattern)[i])
 			}
 		}
     }
-    cat(" done.");
+	names(profiles)<-names(pattern)
+    if(verbose){cat(" done.")}
     ############################################################################
     # (3) output ###############################################################
     return(profiles) 
