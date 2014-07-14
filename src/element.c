@@ -3,7 +3,7 @@
 //  CalcIsoStruct
 //
 //  Created by Christian Gerber on 11/29/12.
-//  Copyright (c) 2012 Eawag. All rights reserved.
+//  Copyright (c) 2012 EAWAG. All rights reserved.
 //
 
 #include <stdio.h>
@@ -23,15 +23,6 @@ int set_element(Element* element, Isotope* isotopes, char* name, int amount, int
     qsort(element->isotopes, iso_amount, sizeof(Isotope), isotope_sort_by_abundance);
 	return 0;
 }
-
-//void print_element(Element* element){
-//    printf("# %d   element %s: \n", element->amount, element->name);
-//    printf("    Isotopes(%d)\n",element->iso_amount);
-//    
-//    for (int i = 0; i < element->iso_amount; i++) {
-//        printf("        %s  mass: %f    abundance: %f\n",(element->isotopes + i)->isotope, (element->isotopes + i)->mass, (element->isotopes + i)->abundance);
-//    }
-//}
 
 int elements_sort_by_isoamount_inc(const void *a, const void *b)
 {

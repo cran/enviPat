@@ -3,7 +3,7 @@
 //  CalcIsoStruct
 //
 //  Created by Christian Gerber on 1/4/13.
-//  Copyright (c) 2013 Eawag. All rights reserved.
+//  Copyright (c) 2013 EAWAG. All rights reserved.
 //
 
 #include <stdio.h>
@@ -56,11 +56,11 @@ int calc_profile_with_trace(    int n,
             double v = 0.0;
             
             if (profile_type == 0) {
-                v = (peaks + j)->abundance * expf(-1.0 * (powf(m - mk, 2.0)*powf(res, 2.0)*log(256))/(2.0*powf(mk, 2.0)));
+                v = (peaks + j)->abundance * exp(-1.0 * (pow(m - mk, 2.0)*pow(res, 2.0)*log(256))/(2.0*pow(mk, 2.0)));
                 if (thres_profile == 0.0) {
                     
                     if ( m < mk ) {
-                        double threshold = a_max *expf(-1.0 * (powf(m - mk, 2.0)*powf(res, 2.0)*log(256))/(2.0*powf(mk, 2.0)));
+                        double threshold = a_max *exp(-1.0 * (pow(m - mk, 2.0)*pow(res, 2.0)*log(256))/(2.0*pow(mk, 2.0)));
                         if (threshold == 0.0) {
                             break;
                         }
@@ -68,7 +68,7 @@ int calc_profile_with_trace(    int n,
                     
                     if (m > mk) {
                         double m_prev = (peaks + index_prev_m)->mass;
-                        double threshold = a_max *expf(-1.0 * (powf(m - m_prev, 2.0)*powf(res, 2.0)*log(256))/(2.0*powf(m_prev, 2.0)));
+                        double threshold = a_max *exp(-1.0 * (pow(m - m_prev, 2.0)*pow(res, 2.0)*log(256))/(2.0*pow(m_prev, 2.0)));
                         if (threshold == 0.0) {
                             index_prev_m = j;
                         }
@@ -86,10 +86,10 @@ int calc_profile_with_trace(    int n,
             }
             
             if (profile_type == 1) {
-                v = ((peaks + j)->abundance * powf(mk, 2.0))/(powf(mk, 2.0) + 4 * powf(res, 2.0) * powf(m-mk, 2.0));
+                v = ((peaks + j)->abundance * pow(mk, 2.0))/(pow(mk, 2.0) + 4.0 * pow(res, 2.0) * pow(m-mk, 2.0));
                 if (thres_profile == 0.0) {
                     if ( m < mk ) {
-                        double threshold = (a_max * powf(mk, 2.0))/(powf(mk, 2.0) + 4 * powf(res, 2.0) * powf(m-mk, 2.0));
+                        double threshold = (a_max * pow(mk, 2.0))/(pow(mk, 2.0) + 4.0 * pow(res, 2.0) * pow(m-mk, 2.0));
                         if (threshold <= thres_profile) {
                             break;
                         }
@@ -97,7 +97,7 @@ int calc_profile_with_trace(    int n,
                     
                     if (m > mk) {
                         double m_prev = (peaks + index_prev_m)->mass;
-                        double threshold = (a_max * powf(m_prev, 2.0))/(powf(m_prev, 2.0) + 4 * powf(res, 2.0) * powf(m-m_prev, 2.0));
+                        double threshold = (a_max * pow(m_prev, 2.0))/(pow(m_prev, 2.0) + 4.0 * pow(res, 2.0) * pow(m-m_prev, 2.0));
                         if (threshold <= thres_profile) {
                             index_prev_m = j;
                         }
@@ -110,7 +110,6 @@ int calc_profile_with_trace(    int n,
                             index_prev_m = j;
                         }
                     }
-                    
                 }
             }
             value += v;
@@ -173,11 +172,11 @@ int calc_profile(double* m, double* a, double* profile_mass, double* profile_a, 
             double v = 0.0;
             
             if (profile_type == 0) {
-                v = (peaks + j)->abundance * expf(-1.0 * (powf(m - mk, 2.0)*powf(res, 2.0)*log(256))/(2.0*powf(mk, 2.0)));
+                v = (peaks + j)->abundance * exp(-1.0 * (pow(m - mk, 2.0)*pow(res, 2.0)*log(256))/(2.0*pow(mk, 2.0)));
                 if (thres_profile == 0.0) {
 
                     if ( m < mk ) {
-                        double threshold = a_max *expf(-1.0 * (powf(m - mk, 2.0)*powf(res, 2.0)*log(256))/(2.0*powf(mk, 2.0)));
+                        double threshold = a_max *exp(-1.0 * (pow(m - mk, 2.0)*pow(res, 2.0)*log(256))/(2.0*pow(mk, 2.0)));
                         if (threshold == 0.0) {
                             break;
                         }
@@ -185,7 +184,7 @@ int calc_profile(double* m, double* a, double* profile_mass, double* profile_a, 
 
                     if (m > mk) {
                         double m_prev = (peaks + index_prev_m)->mass;
-                        double threshold = a_max *expf(-1.0 * (powf(m - m_prev, 2.0)*powf(res, 2.0)*log(256))/(2.0*powf(m_prev, 2.0)));
+                        double threshold = a_max *exp(-1.0 * (pow(m - m_prev, 2.0)*pow(res, 2.0)*log(256))/(2.0*pow(m_prev, 2.0)));
                         if (threshold == 0.0) {
                             index_prev_m = j;
                         } 
@@ -203,10 +202,10 @@ int calc_profile(double* m, double* a, double* profile_mass, double* profile_a, 
             }
             
             if (profile_type == 1) {
-                v = ((peaks + j)->abundance * powf(mk, 2.0))/(powf(mk, 2.0) + 4 * powf(res, 2.0) * powf(m-mk, 2.0));
+                v = ((peaks + j)->abundance * pow(mk, 2.0))/(pow(mk, 2.0) + 4 * pow(res, 2.0) * pow(m-mk, 2.0));
                 if (thres_profile == 0.0) {
                     if ( m < mk ) {
-                        double threshold = (a_max * powf(mk, 2.0))/(powf(mk, 2.0) + 4 * powf(res, 2.0) * powf(m-mk, 2.0));
+                        double threshold = (a_max * pow(mk, 2.0))/(pow(mk, 2.0) + 4 * pow(res, 2.0) * pow(m-mk, 2.0));
                         if (threshold <= thres_profile) {
                             break;
                         }
@@ -214,7 +213,7 @@ int calc_profile(double* m, double* a, double* profile_mass, double* profile_a, 
                     
                     if (m > mk) {
                         double m_prev = (peaks + index_prev_m)->mass;
-                        double threshold = (a_max * powf(m_prev, 2.0))/(powf(m_prev, 2.0) + 4 * powf(res, 2.0) * powf(m-m_prev, 2.0));
+                        double threshold = (a_max * pow(m_prev, 2.0))/(pow(m_prev, 2.0) + 4 * pow(res, 2.0) * pow(m-m_prev, 2.0));
                         if (threshold <= thres_profile) {
                             index_prev_m = j;
                         }

@@ -1,9 +1,8 @@
 //
 //  main.c
-//  CalcIsoStruct
 //
 //  Created by Christian Gerber on 11/28/12.
-//  Copyright (c) 2012 Eawag. All rights reserved.
+//  Copyright (c) 2012 EAWAG. All rights reserved.
 //
 
 #include <stdio.h>
@@ -28,7 +27,6 @@ int calc_algo_1(Element *elements, double *mass, double *a, int *cc, unsigned in
     unsigned int peak_amount = 0;
     
     unsigned short element_amount = e_a;
-    //unsigned short mass_amount = 0;
     unsigned short iso_amount = i_a;
     
     double a_max = 1.0;
@@ -54,7 +52,6 @@ int calc_algo_1(Element *elements, double *mass, double *a, int *cc, unsigned in
 			
 			clean_abundance = a_max/combination_mono_abundance;
 			if(create_combination_algo_1(combinations + j, elements + j, clean_abundance, (threshold * mono_abundance)/100.0, peak_limit,A,C)){
-			//if(create_combination_algo_1_mono(combinations + j, elements + j, (threshold * a_max)/100.0, peak_limit,A,C,a_max)){
 				Rprintf("ERROR: could not create combinations\n");
 				free(combinations);
 				free(A);
@@ -708,9 +705,9 @@ SEXP iso_pattern_Call(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list, 
  profile_mass:          mass values array of the profile
  profile_abundance:     abundance values array of the profile
  type:                  return type of point of interest
-    centroid:                   type = 0
-    local maxima(intensoid):    type = 1
-    valley:                     type = 2
+    centroid:                   		type = 0
+    local maxima(intensoid):    	type = 1
+    valley:                     			type = 2
  
  *************************/
 SEXP iso_centroid_Call(SEXP profile_mass, SEXP profile_abundance, SEXP type) {
@@ -740,9 +737,18 @@ SEXP iso_centroid_Call(SEXP profile_mass, SEXP profile_abundance, SEXP type) {
     unsigned short step = 1;
     
     for (unsigned int i = step; i < n - step; i++) {
-        if (t == 1) {
-            if ( *(p_a + i) >= *(p_a + i + step) && *(p_a + i) > *(p_a + i - step)  ) {
+        if (t == 1)
+        {
+            if (    (
+                        *(p_a + i) > *(p_a + i + step) && *(p_a + i) > *(p_a + i - step)
+                    )
+                    &&
+                    (
+                        *(p_m + i - step) < *(p_m + i) < *(p_m + i + step)
+                    )
                 
+                )
+            {
                 *(c_a + j) = *(p_a + i);
                 *(c_m + j) = *(p_m + i);
                 j++;
@@ -764,7 +770,7 @@ SEXP iso_centroid_Call(SEXP profile_mass, SEXP profile_abundance, SEXP type) {
             if (( (*(p_a + i) <= *(p_a + i + step) && *(p_a + i) < *(p_a + i - step)) || i == n - step - 1)) {
                 
                 double centroid_temp = (upper_sum_a + lower_sum_a)/2.0;
-                if (t == 2 && centroid_temp > 1.0e-30) {
+                if (t == 2) {
                     *(c_a + j) = *(p_a + i);
                     *(c_m + j) = *(p_m + i);
                     j++;
@@ -775,7 +781,7 @@ SEXP iso_centroid_Call(SEXP profile_mass, SEXP profile_abundance, SEXP type) {
                 }
                 
                 if (t == 0) {
-                    if (sum_sticks > 0.0 && centroid_temp > 1.0e-30) {
+                    if (sum_sticks > 0.0 ) {
 						*(c_a + j) = centroid_temp;
 						*(c_m + j) = centroid/sum_sticks;
 						j++;

@@ -3,7 +3,7 @@
 //  CalcIsoStruct
 //
 //  Created by Christian Gerber on 11/29/12.
-//  Copyright (c) 2012 Eawag. All rights reserved.
+//  Copyright (c) 2012 EAWAG. All rights reserved.
 //
 
 #ifndef CalcIsoStruct_element_h

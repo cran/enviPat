@@ -3,8 +3,9 @@
 //  CalcIsoStruct
 //
 //  Created by Christian Gerber on 1/30/13.
-//  Copyright (c) 2013 Eawag. All rights reserved.
+//  Copyright (c) 2013 EAWAG. All rights reserved.
 //
+
 
 #ifndef CalcIsoStruct_preferences_h
 #define CalcIsoStruct_preferences_h
@@ -12,7 +13,7 @@
 // allowed size of Element name, Isotope name
 #define MAX_NAME_SIZE 10
 
-// allowed size of all the isotopes over all occuring elements
+// allowed size of all the isotopes over all occurring elements
 #define MAX_ISO_SIZE 50
 
 // allowed size of isotopes for a single element

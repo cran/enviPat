@@ -3,27 +3,35 @@
 //  CalcIsoStruct
 //
 //  Created by Christian Gerber on 11/29/12.
-//  Copyright (c) 2012 Eawag. All rights reserved.
+//  Copyright (c) 2012 EAWAG. All rights reserved.
 //
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <R.h>
-#include <Rdefines.h>
-
 
 #include "element.h"
 #include "combination.h"
-#include "peak.h"
 #include "parse.h"
 #include "preferences.h"
 #include "n-tuple.h"
 
 
-// algo 3 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-int create_combinations_algo_3(Combination* combination, Element *element, int mass_amount, double threshold)
+/*************************   algorithm 3  *************************************************************************
+ 
+  calculates combinations of the isotopes of the given element
+ 
+  combination:         	contains calculated combinations
+  element:    			element struct with isotope information
+  mass_amount: 		amount of overall elements within the chemical formula. It is used for calculating a appropriate threshold.
+  threshold:      		threshold value to reject combinations with a lower abundance than the threshold value 
+ 
+ ***************************************************************************************************************/
+int create_combinations_algo_3(	Combination* combination, 
+											Element *element, 
+											int mass_amount, 
+											double threshold)
 {
     
     double abundance = 1.0;
@@ -50,10 +58,10 @@ int create_combinations_algo_3(Combination* combination, Element *element, int m
     last_c = 1;
     c++;
     
-    for (int j = 1; j < element->iso_amount; j++) {
-        
+    for (int j = 1; j < element->iso_amount; j++) { 
+	
         for (int l = 0; l < last_c; l++) {
-            
+          
             mass = (combination->compounds + l)->mass;
             abundance = (combination->compounds + l)->abundance;
             memcpy(sum_form, (combination->compounds + l)->sum, MAX_ISO_ELEM * sizeof(unsigned int));
@@ -99,7 +107,19 @@ int create_combinations_algo_3(Combination* combination, Element *element, int m
 }
 
 
-
+/*************************   algorithm 3  *************************************************************************
+ 
+  combines each elements combinations with all the other element combinations to acquire the full set of the chemical formula 
+ 
+  combinations:        contains calculated combinations of each element
+  threshold:      		threshold value to reject combinations with a lower abundance than the threshold value 
+  element_amount:	number of elements
+  m:					pointer to the mass values of the calculated peaks
+  a:					pointer to the abundance values of the calculated peaks
+  peak_amount:		number of calculated and saved peaks
+  peak_limit:			limit of peak calculations. 
+ 
+ ***************************************************************************************************************/
 int calc_pattern_algo_3(Combination* combinations,
                          double threshold,
                          unsigned short element_amount,
@@ -108,7 +128,6 @@ int calc_pattern_algo_3(Combination* combinations,
                          unsigned int* peak_amount,
                          unsigned int peak_limit){
     
-
     unsigned int ar[element_amount];
     const size_t len = element_amount;
     size_t sizes[element_amount];
@@ -121,6 +140,7 @@ int calc_pattern_algo_3(Combination* combinations,
         max_mass += (combinations + i)->max_mass;
     }
     
+	// deletes combinations within each elements combinations to avoid the calculation of non relevant peaks
     clean_combinations_algo_3(combinations, threshold * max_abundance / 100 , element_amount);
     
     double mass;
@@ -162,13 +182,24 @@ int calc_pattern_algo_3(Combination* combinations,
 }
 
 
-int clean_combinations_algo_3( Combination* combinations, double threshold, unsigned short comb_amount){
+/*************************   algorithm 3  *************************************************************************
+ 
+  this function combines the combinations of each element with the maximum combination of the other elements.
+  if the resulting abundance value is lower than the threshold value, this combination is deleted, because it is impossible to
+  reach the threshold value.
+ 
+  combinations:        contains calculated combinations of each element
+  threshold:      		threshold value to reject combinations with a lower abundance than the threshold value 
+  element_amount:	number of different elements	
+ 
+ ***************************************************************************************************************/
+int clean_combinations_algo_3( Combination* combinations, double threshold, unsigned short element_amount){
 
     double clean_abundance = 1.0;
     double clean_abundance_other = 1.0;
-    for (unsigned short b = 0; b < comb_amount; b++) {
+    for (unsigned short b = 0; b < element_amount; b++) {
         clean_abundance_other = 1.0;
-        for (int d = 0; d < comb_amount; d++) {
+        for (int d = 0; d < element_amount; d++) {
             if (d != b) {
                 clean_abundance_other *= (combinations + d)->max_abundance;
             }
@@ -194,7 +225,11 @@ int clean_combinations_algo_3( Combination* combinations, double threshold, unsi
 }
 
 
-// algo 1 ////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************   algorithm 1  *************************************************************************
+ 
+  this functions calculates the maximum possible abundance
+ 
+ ***************************************************************************************************************/
 int calc_combination_max_abundance(
                                    Combination2* combination,
                                    Element *element,
@@ -206,7 +241,10 @@ int calc_combination_max_abundance(
     CompoundMulti* monoisotopic = (CompoundMulti*)calloc(1,sizeof(CompoundMulti));
     
     int iso_c = 0;
+	
+	// creates the isotope list of a single element
     create_isotope_list_single(element, isotopes, &iso_c);
+	// calculates the mono isotopic peak of a single element
     calc_monoisotopic_single(element, monoisotopic);
     
     A->amount = 0;
@@ -225,26 +263,14 @@ int calc_combination_max_abundance(
     double max_a = 0.0;
     double max_mass = 0.0;
     unsigned int c = 0;
-    
-    
-    //if(combination->compounds && combination->a2_amount){
-		
+
     combination->compounds->mass = monoisotopic->mass;
     combination->compounds->abundance = monoisotopic->abundance;
 	max_a = monoisotopic->abundance;
-    memcpy((combination->compounds + c)->sum, monoisotopic->sum, MAX_ISO_ELEM * sizeof(unsigned int));
+    memcpy(combination->compounds->sum, monoisotopic->sum, MAX_ISO_ELEM * sizeof(unsigned int));
+	combination->a2_amount = 0;
     c++;
  
-    combination->a2_amount = 0;
-    
-	//	}else{
-	//		
-    //                            free(monoisotopic);
-    //                            free(isotopes);
-    //                            free(current_highest);
-    //                            return 0;
-	//		}
-    
     unsigned short iso_nr_max = 0;
     while (current->abundance != -1.0) {
         *current_highest = *current;
@@ -297,7 +323,6 @@ int calc_combination_max_abundance(
                         A->amount++;
                         
                         if (A->amount > MAX_COMPOUNDS_A) {
-                            //printf("reached limit for A list\n");
                             free(isotopes);
                             free(monoisotopic);
                             free(current_highest);
@@ -404,26 +429,14 @@ int calc_combination_max_abundance_mono(
     double max_a = 0.0;
     double max_mass = 0.0;
     unsigned int c = 0;
-    
-    
-    //if(combination->compounds && combination->a2_amount){
-		
+
     combination->compounds->mass = monoisotopic->mass;
     combination->compounds->abundance = monoisotopic->abundance;
 	max_a = monoisotopic->abundance;
-    memcpy((combination->compounds + c)->sum, monoisotopic->sum, MAX_ISO_ELEM * sizeof(unsigned int));
+    memcpy(combination->compounds->sum, monoisotopic->sum, MAX_ISO_ELEM * sizeof(unsigned int));
+	combination->a2_amount = 0;
     c++;
- 
-    combination->a2_amount = 0;
-    
-	//	}else{
-	//		
-    //                            free(monoisotopic);
-    //                            free(isotopes);
-    //                            free(current_highest);
-    //                            return 0;
-	//		}
-    
+
     unsigned short iso_nr_max = 0;
     while (current->abundance != -1.0) {
         *current_highest = *current;
@@ -476,7 +489,6 @@ int calc_combination_max_abundance_mono(
                         A->amount++;
                         
                         if (A->amount > MAX_COMPOUNDS_A) {
-                            //printf("reached limit for A list\n");
                             free(isotopes);
                             free(monoisotopic);
                             free(current_highest);
@@ -643,7 +655,6 @@ int create_combination_algo_1_mono( Combination2 *combination,
             free(isotopes);
             free(current);
             free(current_highest);
-            //printf("exeeded combination amount\n");
             return 1;
         }
         
@@ -792,10 +803,7 @@ int create_combination_algo_1(      Combination2 *combination,
         free(current_highest);
         return 0;
 	}
-    
-    
-    //clean_abundance = a_max/(combinations + j)->max_abundance;
-    
+
     if (clean_abundance * current->abundance >= threshold && current->mass > 1.0) {
         
         (combination->compounds + c)->mass = current->mass;
@@ -847,7 +855,6 @@ int create_combination_algo_1(      Combination2 *combination,
             free(isotopes);
             free(current);
             free(current_highest);
-            //printf("exeeded combination amount\n");
             return 1;
         }
         
@@ -983,7 +990,6 @@ int combine_combinations_algo_1(Combination2* combinations,
         
         mass = 0.0;
         abundance = 1.0;
-        //unsigned int last_updated = element_amount - 1;
         int cc_count = 0;
         int cc_tmp[iso_amount];
         
@@ -994,9 +1000,6 @@ int combine_combinations_algo_1(Combination2* combinations,
                 double tmp_mass = 0.0;
                 double tmp_abundance = 1.0;
                 for (int h = 0; h < (combinations + j)->amount; h++) {
-                    
-                    //tracking[j] = h;
-                    
                     tmp_mass = mass;
                     tmp_abundance = abundance;
                     tmp_mass += ((combinations + j)->compounds + tracking[j])->mass;
@@ -1008,27 +1011,14 @@ int combine_combinations_algo_1(Combination2* combinations,
                         memcpy(cc + v*iso_amount + cc_count, ((combinations + j)->compounds + tracking[j])->sum, (combinations + j)->element.iso_amount * sizeof(int));
                         v++;
                         if (v > peak_limit) {
-                            //printf("exeeded peak limit\n");
                             *(peak_amount) = v;
                             return 1;
                         }
                         tracking[j]++;
                     }else{
-//                        for (int k = last_updated + 1; k < element_amount; k++) {
-//                            unsigned int update = 1;
-//                            if (tracking[k] != 0) {
-//                                update = 0;
-//                            }
-//                            
-//                            if (update) {
-//                                printf("update");
-//                                tracking[last_updated]++;
-//                            }
-//                        }
                         tracking[j]++;
                         break;
                     }
-                    //tracking[j]++;
                 }
             }else{
                 if (tracking[j] < (combinations + j)->amount) {
@@ -1048,8 +1038,6 @@ int combine_combinations_algo_1(Combination2* combinations,
         for (int k = element_amount - 2; k >= 0; k--) {
             if (tracking[k] < combinations[k].amount) {
                 tracking[k]++;
-                //last_updated = k;
-                
                 for (int l = k + 1; l < element_amount; l++) {
                     tracking[l] = 0;
                 }
@@ -1604,14 +1592,17 @@ int combinations_sort_by_amount_dec(const void *a, const void *b)
 }
 
 void calc_monoisotopic_single(Element* element, CompoundMulti *monoisotopic){
+
     double abundance = 1.0;
     double mass = 0.0;
     unsigned short pos = 0;
+	
     for (int g = 0; g < element->amount; g++) {
         mass += (element->isotopes)->mass;
         abundance *= (element->isotopes)->abundance;
         monoisotopic->sum[pos]++;
     }
+	
     monoisotopic->counter[0] = 0;
     monoisotopic->mass = mass;
     monoisotopic->abundance = abundance;
@@ -1631,9 +1622,7 @@ void create_isotope_list_single(Element *element, Isotope2 *isotopes, int *iso_c
         strcpy((isotopes + *iso_c)->isotope, (element->isotopes + j)->isotope);
         *(iso_c) += 1;
     }
-    
-    //qsort(isotopes, *iso_c, sizeof(Isotope2), isotope2_sort_by_n_abundance_dec);
-    //qsort(isotopes, *iso_c, sizeof(Isotope2), isotope2_sort_by_abundance_dec);
+
     qsort(isotopes, *iso_c, sizeof(Isotope2), isotope2_sort_by_n_abundance_dec);
     
     for (int k = 0; k < *iso_c; k++) {
