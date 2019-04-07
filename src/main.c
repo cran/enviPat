@@ -172,8 +172,6 @@ int alloc_peaks(int p_l, size_t iso_amount, double **m_, double **a_, int **cc_)
         rtm = INTEGER_VALUE(rel_to_mono);
         rica = INTEGER_VALUE(return_iso_calc_amount);
 
-        UNPROTECT(6);
-
         if (p_l >= INT_LIMIT || p_l < 1) {
 
             Rprintf("\ninvalid peak limit");
@@ -182,6 +180,8 @@ int alloc_peaks(int p_l, size_t iso_amount, double **m_, double **a_, int **cc_)
 
         strcpy(s, CHARACTER_VALUE(sum));
         strcpy(i_l, CHARACTER_VALUE(iso_list));
+
+        UNPROTECT(6);
 
 #if SHOW_DETAILS == 1
         Rprintf("\n%s, algo2, ",s);
@@ -331,7 +331,15 @@ int alloc_peaks(int p_l, size_t iso_amount, double **m_, double **a_, int **cc_)
             PROTECT(list_names = allocVector(STRSXP, iso_amount + 3));
             for(ptrdiff_t o = 0; o < n_c; o++){
                 char tmp[ MAX_NAME_SIZE ];
-                strncpy(tmp, names + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+
+                memcpy(tmp, names + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+                tmp[ MAX_NAME_SIZE - 1] = '\0';
+
+                // #pragma GCC diagnostic push
+                // #pragma GCC diagnostic ignored "-Wstringop-truncation"
+                //     strncpy(tmp, names + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+                // #pragma GCC diagnostic pop
+
                 SET_STRING_ELT(list_names, o,  mkChar(tmp));
             }
             SET_STRING_ELT(list_names, n_c,  mkChar("NAMES"));
@@ -392,7 +400,6 @@ SEXP iso_pattern_Call_4(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
     rtm = INTEGER_VALUE(rel_to_mono);
     rica = INTEGER_VALUE(return_iso_calc_amount);
 
-    UNPROTECT(6);
 
     if (p_l >= INT_LIMIT || p_l < 1) {
 
@@ -402,6 +409,8 @@ SEXP iso_pattern_Call_4(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
 
     strcpy(s, CHARACTER_VALUE(sum));
     strcpy(i_l, CHARACTER_VALUE(iso_list));
+
+    UNPROTECT(6);
 
 #if SHOW_DETAILS == 1
     Rprintf("\n%s, algo4, ",s);
@@ -515,7 +524,15 @@ SEXP iso_pattern_Call_4(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
                 }
 
                 INTEGER(out)[j] = (elements+i)->all_iso_calc_amount;
-                strncpy(tmp, (elements+i)->name, MAX_NAME_SIZE * sizeof(char));
+
+                memcpy(tmp, (elements+i)->name, MAX_NAME_SIZE * sizeof(char));
+                tmp[ MAX_NAME_SIZE - 1] = '\0';
+
+                // #pragma GCC diagnostic push
+                // #pragma GCC diagnostic ignored "-Wstringop-truncation"
+                //     strncpy(tmp, (elements+i)->name, MAX_NAME_SIZE * sizeof(char));
+                // #pragma GCC diagnostic pop
+
                 j++;
             }else if(j > 0){
                 strcat(tmp, (elements + i)->name);
@@ -572,7 +589,15 @@ SEXP iso_pattern_Call_4(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
         PROTECT(list_names = allocVector(STRSXP, iso_amount + 3));
         for(ptrdiff_t o = 0; o < iso_amount + 2; o++){
             char tmp[ MAX_NAME_SIZE ];
-            strncpy(tmp, l_n + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+
+            memcpy(tmp, l_n + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+            tmp[ MAX_NAME_SIZE - 1] = '\0';
+
+            // #pragma GCC diagnostic push
+            // #pragma GCC diagnostic ignored "-Wstringop-truncation"
+            //     strncpy(tmp, l_n + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+            // #pragma GCC diagnostic pop
+
             SET_STRING_ELT(list_names, o,  mkChar(tmp));
         }
         SET_STRING_ELT(list_names, iso_amount + 2,  mkChar("NAMES"));
@@ -632,8 +657,6 @@ SEXP iso_pattern_Call_4(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
         rtm = INTEGER_VALUE(rel_to_mono);
         rica = INTEGER_VALUE(return_iso_calc_amount);
 
-        UNPROTECT(6);
-
         if (p_l >= INT_LIMIT || p_l < 1) {
 
             Rprintf("\ninvalid peak limit");
@@ -642,6 +665,8 @@ SEXP iso_pattern_Call_4(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
 
         strcpy(s, CHARACTER_VALUE(sum));
         strcpy(i_l, CHARACTER_VALUE(iso_list));
+
+        UNPROTECT(6);
 
 #if SHOW_DETAILS == 1
         Rprintf("\n%s, algo3, ",s);
@@ -752,7 +777,15 @@ SEXP iso_pattern_Call_4(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
                 INTEGER(out)[i] = (elements+i)->all_iso_calc_amount;
 
                 char tmp[ MAX_NAME_SIZE ];
-                strncpy(tmp, (elements+i)->name, MAX_NAME_SIZE * sizeof(char));
+
+                memcpy(tmp, (elements+i)->name, MAX_NAME_SIZE * sizeof(char));
+                tmp[ MAX_NAME_SIZE - 1] = '\0';
+
+                // #pragma GCC diagnostic push
+                // #pragma GCC diagnostic ignored "-Wstringop-truncation"
+                //     strncpy(tmp, (elements+i)->name, MAX_NAME_SIZE * sizeof(char));
+                // #pragma GCC diagnostic pop
+
                 SET_STRING_ELT(list_names_elements, i,  mkChar(tmp));
             }
 
@@ -802,7 +835,15 @@ SEXP iso_pattern_Call_4(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
             PROTECT(list_names = allocVector(STRSXP, iso_amount + 3));
             for(ptrdiff_t o = 0; o < iso_amount + 2; o++){
                 char tmp[ MAX_NAME_SIZE ];
-                strncpy(tmp, l_n + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+
+                memcpy(tmp, l_n + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+                tmp[ MAX_NAME_SIZE - 1] = '\0';
+
+                // #pragma GCC diagnostic push
+                // #pragma GCC diagnostic ignored "-Wstringop-truncation"
+                //     strncpy(tmp, l_n + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+                // #pragma GCC diagnostic pop
+
                 SET_STRING_ELT(list_names, o,  mkChar(tmp));
             }
             SET_STRING_ELT(list_names, iso_amount + 2,  mkChar("NAMES"));
@@ -862,7 +903,6 @@ SEXP iso_pattern_Call_4(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
         rtm = INTEGER_VALUE(rel_to_mono);
         rica = INTEGER_VALUE(return_iso_calc_amount);
 
-        UNPROTECT(6);
 
         if (p_l >= INT_LIMIT || p_l < 1) {
 
@@ -872,6 +912,8 @@ SEXP iso_pattern_Call_4(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
 
         strcpy(s, CHARACTER_VALUE(sum));
         strcpy(i_l, CHARACTER_VALUE(iso_list));
+
+        UNPROTECT(6);
 
 #if SHOW_DETAILS == 1
         Rprintf("\n%s, algo1, ",s);
@@ -980,7 +1022,15 @@ SEXP iso_pattern_Call_4(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
                 INTEGER(out)[i] = (int)(elements+i)->all_iso_calc_amount;
 
                 char tmp[ MAX_NAME_SIZE ];
-                strncpy(tmp, (elements+i)->name, name_size);
+
+                memcpy(tmp, (elements+i)->name, name_size);
+                tmp[ MAX_NAME_SIZE - 1] = '\0';
+
+                // #pragma GCC diagnostic push
+                // #pragma GCC diagnostic ignored "-Wstringop-truncation"
+                //     strncpy(tmp, (elements+i)->name, name_size);
+                // #pragma GCC diagnostic pop
+
                 SET_STRING_ELT(list_names_elements, i,  mkChar(tmp));
             }
 
@@ -1031,7 +1081,15 @@ SEXP iso_pattern_Call_4(SEXP sum, SEXP peak_limit, SEXP threshold, SEXP iso_list
 
             for(ptrdiff_t o = 0; o < iso_amount + 2; o++){
                 char tmp[ MAX_NAME_SIZE ];
-                strncpy(tmp, l_n + o * MAX_NAME_SIZE, name_size);
+
+                memcpy(tmp, l_n + o * MAX_NAME_SIZE, name_size);
+                tmp[ MAX_NAME_SIZE - 1] = '\0';
+
+                // #pragma GCC diagnostic push
+                // #pragma GCC diagnostic ignored "-Wstringop-truncation"
+                //     strncpy(tmp, l_n + o * MAX_NAME_SIZE, name_size);
+                // #pragma GCC diagnostic pop
+
                 SET_STRING_ELT(list_names, o,  mkChar(tmp));
             }
             SET_STRING_ELT(list_names, iso_amount + 2,  mkChar("NAMES"));
@@ -1099,9 +1157,9 @@ SEXP iso_pattern(SEXP sum
     rtm = INTEGER_VALUE(rel_to_mono);
     rica = INTEGER_VALUE(return_iso_calc_amount);
 
-    UNPROTECT(5);
-
     strcpy(s, CHARACTER_VALUE(sum));
+
+    UNPROTECT(5);
 
     // parse elements ///////////////////////////////////////////////////////////////
 
@@ -1276,7 +1334,15 @@ SEXP iso_pattern(SEXP sum
             INTEGER(out)[i] = (int)(elements+i)->all_iso_calc_amount;
 
             char tmp[ MAX_NAME_SIZE ];
-            strncpy(tmp, (elements+i)->name, name_size);
+
+            memcpy(tmp, (elements+i)->name, name_size);
+            tmp[ MAX_NAME_SIZE - 1] = '\0';
+
+            // #pragma GCC diagnostic push
+            // #pragma GCC diagnostic ignored "-Wstringop-truncation"
+            //     strncpy(tmp, (elements+i)->name, name_size);
+            // #pragma GCC diagnostic pop
+
             SET_STRING_ELT(list_names_elements, i,  mkChar(tmp));
         }
 
@@ -1370,15 +1436,23 @@ SEXP iso_pattern(SEXP sum
 			rans[i + nx] = a_[i];
 
             for(int j = 2; j < ny; j++){
-					if (i == 0) {
-						SET_STRING_ELT(dimy, 0, mkChar("mass"));
-						SET_STRING_ELT(dimy, 1, mkChar("abundance"));
-						char tmp_s[ MAX_NAME_SIZE ];
-						strncpy(tmp_s, l_n + j* MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
-						SET_STRING_ELT(dimy, j,  mkChar(tmp_s));
-					}
-					rans[i + nx*j] = cc_[i * iso_amount + j - 2];
+				if (i == 0) {
+					SET_STRING_ELT(dimy, 0, mkChar("mass"));
+					SET_STRING_ELT(dimy, 1, mkChar("abundance"));
+					char tmp_s[ MAX_NAME_SIZE ];
+
+                    memcpy(tmp_s, l_n + j* MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+                    tmp_s[ MAX_NAME_SIZE - 1] = '\0';
+
+                    // #pragma GCC diagnostic push
+                    // #pragma GCC diagnostic ignored "-Wstringop-truncation"
+                    //     strncpy(tmp_s, l_n + j* MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+                    // #pragma GCC diagnostic pop
+
+					SET_STRING_ELT(dimy, j,  mkChar(tmp_s));
 				}
+				rans[i + nx*j] = cc_[i * iso_amount + j - 2];
+			}
         }
 
         PROTECT(dim = allocVector(INTSXP, 2));
@@ -1455,9 +1529,9 @@ SEXP iso_pattern_2(SEXP sum
     rtm = INTEGER_VALUE(rel_to_mono);
     rica = INTEGER_VALUE(return_iso_calc_amount);
 
-    UNPROTECT(5);
-
     strcpy(s, CHARACTER_VALUE(sum));
+
+    UNPROTECT(5);
 
     // parse elements ///////////////////////////////////////////////////////////////
 
@@ -1675,7 +1749,15 @@ SEXP iso_pattern_2(SEXP sum
         PROTECT(list_names = allocVector(STRSXP, iso_amount + 3));
         for(ptrdiff_t o = 0; o < n_c; o++){
             char tmp[ MAX_NAME_SIZE ];
-            strncpy(tmp, names + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+
+            memcpy(tmp, names + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+            tmp[ MAX_NAME_SIZE - 1] = '\0';
+
+            // #pragma GCC diagnostic push
+            // #pragma GCC diagnostic ignored "-Wstringop-truncation"
+            //     strncpy(tmp, names + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+            // #pragma GCC diagnostic pop
+
             SET_STRING_ELT(list_names, o,  mkChar(tmp));
         }
         SET_STRING_ELT(list_names, n_c,  mkChar("NAMES"));
@@ -1687,6 +1769,7 @@ SEXP iso_pattern_2(SEXP sum
         free(a_);
         free(cc_);
         free(names);
+        
         UNPROTECT(4);
 
 #if SHOW_DETAILS == 1
@@ -1744,9 +1827,9 @@ SEXP iso_pattern_3(SEXP sum
     rtm = INTEGER_VALUE(rel_to_mono);
     rica = INTEGER_VALUE(return_iso_calc_amount);
 
-    UNPROTECT(5);
-
     strcpy(s, CHARACTER_VALUE(sum));
+
+    UNPROTECT(5);
 
     // parse elements ///////////////////////////////////////////////////////////////
     PROTECT(iso_list_elem = AS_CHARACTER(iso_list_elem));
@@ -1909,7 +1992,16 @@ SEXP iso_pattern_3(SEXP sum
             INTEGER(out)[i] = (elements+i)->all_iso_calc_amount;
 
             char tmp[ MAX_NAME_SIZE ];
-            strncpy(tmp, (elements+i)->name, MAX_NAME_SIZE * sizeof(char));
+
+
+            memcpy(tmp, (elements+i)->name, MAX_NAME_SIZE * sizeof(char));
+            tmp[ MAX_NAME_SIZE - 1] = '\0';
+
+            // #pragma GCC diagnostic push
+            // #pragma GCC diagnostic ignored "-Wstringop-truncation"
+            //     strncpy(tmp, (elements+i)->name, MAX_NAME_SIZE * sizeof(char));
+            // #pragma GCC diagnostic pop
+
             SET_STRING_ELT(list_names_elements, i,  mkChar(tmp));
         }
 
@@ -1959,7 +2051,16 @@ SEXP iso_pattern_3(SEXP sum
         PROTECT(list_names = allocVector(STRSXP, iso_amount + 3));
         for(ptrdiff_t o = 0; o < iso_amount + 2; o++){
             char tmp[ MAX_NAME_SIZE ];
-            strncpy(tmp, l_n + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+
+
+            memcpy(tmp, l_n + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+            tmp[ MAX_NAME_SIZE - 1] = '\0';
+
+            // #pragma GCC diagnostic push
+            // #pragma GCC diagnostic ignored "-Wstringop-truncation"
+            //     strncpy(tmp, l_n + o * MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+            // #pragma GCC diagnostic pop
+
             SET_STRING_ELT(list_names, o,  mkChar(tmp));
         }
         SET_STRING_ELT(list_names, iso_amount + 2,  mkChar("NAMES"));
@@ -2028,9 +2129,9 @@ SEXP iso_pattern_4(SEXP sum
     rtm = INTEGER_VALUE(rel_to_mono);
     rica = INTEGER_VALUE(return_iso_calc_amount);
 
-    UNPROTECT(5);
-
     strcpy(s, CHARACTER_VALUE(sum));
+
+    UNPROTECT(5);
 
     // parse elements ///////////////////////////////////////////////////////////////
     PROTECT(iso_list_elem = AS_CHARACTER(iso_list_elem));
@@ -2209,7 +2310,15 @@ SEXP iso_pattern_4(SEXP sum
                 }
 
                 INTEGER(out)[j] = (elements+i)->all_iso_calc_amount;
-                strncpy(tmp, (elements+i)->name, MAX_NAME_SIZE * sizeof(char));
+
+                memcpy(tmp, (elements+i)->name, MAX_NAME_SIZE * sizeof(char));
+                tmp[ MAX_NAME_SIZE - 1] = '\0';
+
+                // #pragma GCC diagnostic push
+                // #pragma GCC diagnostic ignored "-Wstringop-truncation"
+                //     strncpy(tmp, (elements+i)->name, MAX_NAME_SIZE * sizeof(char));
+                // #pragma GCC diagnostic pop
+
                 j++;
             }else if(j > 0){
                 strcat(tmp, (elements + i)->name);
@@ -2313,7 +2422,15 @@ SEXP iso_pattern_4(SEXP sum
 						SET_STRING_ELT(dimy, 0, mkChar("mass"));
 						SET_STRING_ELT(dimy, 1, mkChar("abundance"));
 						char tmp_s[ MAX_NAME_SIZE ];
-						strncpy(tmp_s, l_n + j* MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+
+                        memcpy(tmp_s, l_n + j* MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+                        tmp_s[ MAX_NAME_SIZE - 1] = '\0';
+
+                        // #pragma GCC diagnostic push
+                        // #pragma GCC diagnostic ignored "-Wstringop-truncation"
+                        //     strncpy(tmp_s, l_n + j* MAX_NAME_SIZE, MAX_NAME_SIZE * sizeof(char));
+                        // #pragma GCC diagnostic pop
+
 						SET_STRING_ELT(dimy, j,  mkChar(tmp_s));
 					}
 					rans[i + nx*j] = cc_[i * iso_amount + j - 2];

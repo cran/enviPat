@@ -13,7 +13,7 @@
   \item{isotopes}{\code{\link[enviPat]{isotopes}}}
   \item{chemforms}{Vector of character strings with chemical formulas}
   \item{get_sorted}{Should elements in each formula be sorted according to their order in \code{isotopes}?}
-  \item{get_list}{Return list with vectors of elements atom counts contained in each chemical formula?}
+  \item{get_list}{Return list with vectors of elementwise atom counts contained in each chemical formula?}
 }
 
 
