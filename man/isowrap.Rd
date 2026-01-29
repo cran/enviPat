@@ -15,9 +15,9 @@ Uses chemical formulas from \code{\link[enviPat]{check_chemform}} as argument.
 
 \usage{
 isowrap(isotopes, checked, resmass, resolution = FALSE, nknots = 6, 
-spar = 0.2, threshold = 0.1, charge = 1, emass = 0.00054858, algo=2, 
+spar = 0.2, threshold = 0.1, charge = 1, emass = 0.00054857990924, algo=2, 
 ppm = FALSE, dmz = "get", frac = 1/4, env = "Gaussian", 
-detect = "centroid", plotit = FALSE)
+detect = "centroid", plotit = FALSE,verbose = TRUE )
 }
 
 \arguments{
@@ -54,6 +54,9 @@ detect = "centroid", plotit = FALSE)
   	\item{detect}{Return either \code{"centroid"}, \code{"intensoid"} or \code{"valley"}. See \code{\link[enviPat]{vdetect}}.}
 
   	\item{plotit}{Should results be plotted, \code{TRUE/FALSE}?}
+	
+	\item{verbose}{Verbose, \code{TRUE/FALSE}?}
+	
 }
 
 
@@ -98,7 +101,6 @@ centro<-isowrap(
   spar=0.2,
   threshold=0.1,
   charge=1,
-  emass=0.00054858,
   algo=2,
   ppm=FALSE,
   dmz="get",   # retrieve dm from R=m/dm
